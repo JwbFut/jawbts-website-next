@@ -1,3 +1,5 @@
+"use server"
+
 import { cookies } from "next/headers";
 import * as jose from "jose"
 export const jwks = jose.createRemoteJWKSet(new URL(process.env.API_URL + "/auth/keys"));
@@ -8,7 +10,7 @@ export default class AuthUtils {
      * @returns 登录信息是否有效
      * 0 -> 无效; 1 -> 有效; 2 -> 过期
      */
-    static async checkAuth() {
+    static async checkAuth(first_try: boolean = true): Promise<number> {
         const cookieStorage = cookies();
         let token = cookieStorage.get("token")?.value;
         let username = cookieStorage.get("username")?.value;
@@ -25,6 +27,9 @@ export default class AuthUtils {
         } catch(err) {
             if ((err as Error).message === '"exp" claim timestamp check failed') {
                 return 2;
+            }
+            if ((err as Error).message === 'request timed out' && first_try) {
+                return await this.checkAuth(false);
             }
             return 0;
         }

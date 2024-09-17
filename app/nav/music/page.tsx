@@ -17,7 +17,6 @@ export default function Page() {
 
     const e_callback = (info: any) => {
         setCurPlayingInfo(info);
-        console.log(info);
     }
     EventBus.removeListener("musicPlayer_musicInfo", e_callback);
     EventBus.on("musicPlayer_musicInfo", e_callback);

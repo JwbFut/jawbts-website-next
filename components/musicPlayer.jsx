@@ -140,7 +140,7 @@ export default function MusicPlayer() {
 
         audioRef.current.currentTime = 0;
         // console.log(Date.now(), "start", audioRef.current.currentTime);
-        new Promise(resolve => setTimeout(resolve, 2500)).then(() => {
+        new Promise(resolve => setTimeout(resolve, 10000)).then(() => {
             // console.log(Date.now(), "end");
             // console.log(audioRef.current.currentTime, audioRef.current.readyState);
             if (0 < audioRef.current.currentTime && audioRef.current.readyState >= 2) return;

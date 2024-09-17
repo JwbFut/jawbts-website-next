@@ -8,7 +8,7 @@ import { useCookies } from "react-cookie";
 
 export default function Page() {
     const [cookie, setCookie] = useCookies(["username", "token"]);
-    const [profile, setProfile] = useState();
+    const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -17,23 +17,34 @@ export default function Page() {
 
     function proc_profile() {
         if (!profile) return {
-            "id": "unknown",
-            "username": "unknown",
-            "avatar_url": "https://cdn.jawbts.org/photos/logo.png",
+            "id": "Loading...",
+            "username": "Loading...",
+            "avatar_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC",
             "description": "",
             "ref_tokens": [
+                {
+                    "scope": [
+                        "Loading...",
+                    ],
+                    "desc_c": "Loading...",
+                    "state_c": "Loading...",
+                    "exp_time": new Date().toISOString(),
+                    "ref_token": null
+                },
             ]
-        }
+        };
         return profile["data"];
     }
 
     useEffect(() => {
         const getP_c = async () => {
-            let p = await getProfile(cookie.token)
-            setProfile(p);
-            setAvatarUrl_e(p["data"]["avatar_url"]);
-            setDescription_e(p["data"]["description"]);
-            setLoading(false);
+            let p = await getProfile(cookie.token);
+            if (p["data"]) {
+                setProfile(p);
+                setAvatarUrl_e(p["data"]["avatar_url"]);
+                setDescription_e(p["data"]["description"]);
+                if (loading) setLoading(false);
+            }
         }
 
         getP_c();
@@ -101,7 +112,7 @@ export default function Page() {
                 <div className="col-span-2">
                     <article className="pr-2 overflow-hidden">
                         <h1 className="text-[#f3f3f3] text-center m-2 lg:text-3xl lg:font-black text-xl font-bold">{proc_profile()["username"]}</h1>
-                        <div className="text-[#f3f3f3] text-center m-2 text-base" dangerouslySetInnerHTML={{__html: Utils.escapeDescription(proc_profile()["description"])}}></div>
+                        <div className="text-[#f3f3f3] text-center m-2 text-base" dangerouslySetInnerHTML={{ __html: Utils.escapeDescription(proc_profile()["description"]) }}></div>
                         <p className="text-[#f3f3f3] text-center m-2 text-base">{proc_profile()["avatar_url"]}</p>
                     </article>
                 </div>

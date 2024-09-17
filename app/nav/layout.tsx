@@ -8,7 +8,7 @@ export default function RootLayout({
     return (
         <header className="bg-[#222222] w-screen h-full">
             <Navbar />
-            {children}
+            <div className="pt-20">{children}</div>
         </header>
     );
 }

@@ -9,31 +9,32 @@ import { useCookies } from "react-cookie";
 export default function Page() {
     const [cookie, setCookie] = useCookies(["username", "token", "client_id"]);
     const [profile, setProfile] = useState({
-        "id": "unknown",
-        "username": "unknown",
-        "avatar_url": "https://cdn.jawbts.org/photos/logo.png",
+        "id": "Loading...",
+        "username": "Loading...",
+        "avatar_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC",
         "description": "",
         "ref_tokens": [
             {
                 "scope": [
-                    "...",
+                    "Loading...",
                 ],
-                "desc_c": "...",
-                "state_c": "...",
-                "exp_time": "2024-01-28T02:51:39.380Z",
+                "desc_c": "Loading...",
+                "state_c": "Loading...",
+                "exp_time": new Date().toISOString(),
                 "ref_token": null
             },
         ]
     });
     const [loading, setLoading] = useState(false);
-    const [clientId, setClientId] = useState("UNKNOWN");
+    const [clientId, setClientId] = useState("Loading...");
 
     async function remove_token(event: MouseEvent<HTMLButtonElement>) {
         setLoading(true);
         try {
             event.preventDefault();
             await removeRefreshToken(cookie.token, event.currentTarget.name);
-            setProfile((await getProfile(cookie.token))["data"]);
+            const p = (await getProfile(cookie.token))["data"];
+            if (p) setProfile(p);
             setLoading(false);
         } catch(e) {
             console.log(e);
@@ -46,7 +47,8 @@ export default function Page() {
         const getP_c = async () => {
             setLoading(true);
             try {
-                setProfile((await getProfile(cookie.token))["data"]);
+                const p = (await getProfile(cookie.token))["data"];
+                if (p) setProfile(p);
                 setLoading(false);
             } catch(e) {
                 console.log(e);

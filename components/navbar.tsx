@@ -21,6 +21,7 @@ import {
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export const tools = [
     { name: '音乐', description: '高度自定义化放音乐的', href: '/nav/music', icon: MusicalNoteIcon },
@@ -37,7 +38,7 @@ export default function Navbar() {
                 <div className="flex lg:flex-1">
                     <Link href="#" className="-m-1.5 p-1.5">
                         <span className="sr-only">Jawbts</span>
-                        <img alt="" src="https://cdn.jawbts.org/photos/logo.png" className="h-8 w-auto" />
+                        <Image height={8} width={8} alt="" src="https://cdn.jawbts.org/photos/logo.png" className="h-8 w-auto" />
                     </Link>
                 </div>
                 <div className="flex lg:hidden">
@@ -105,7 +106,9 @@ export default function Navbar() {
                     <div className="flex items-center justify-between">
                         <Link href="#" className="-m-1.5 p-1.5">
                             <span className="sr-only">Jawbts</span>
-                            <img
+                            <Image
+                                height={8}
+                                width={8}
                                 alt=""
                                 src="https://cdn.jawbts.org/photos/logo.png"
                                 className="h-8 w-auto"

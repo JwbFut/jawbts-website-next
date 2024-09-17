@@ -67,6 +67,7 @@ export default function Page() {
         <div className="absolute m-auto inset-x-0 inset-y-0 w-1/2 h-1/2 text-gray-100 text-center text-xl">
             Token Refresh Page. <br /><br />
             {mes}
+            {mes.toLowerCase().includes("redirecting") ? (<><br /> <br /><p>If not redirect automatically, please refresh the page.</p></>) : ""}
         </div>
     );
 }

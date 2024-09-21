@@ -1,6 +1,7 @@
 "use client"
 
 import { refreshJwt } from "@/components/serverActions";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
@@ -67,7 +68,7 @@ export default function Page() {
         <div className="absolute m-auto inset-x-0 inset-y-0 w-1/2 h-1/2 text-gray-100 text-center text-xl">
             Token Refresh Page. <br /><br />
             {mes}
-            {mes.toLowerCase().includes("redirecting") ? (<><br /> <br /><p>If not redirect automatically, please refresh the page.</p></>) : ""}
+            {mes.toLowerCase().includes("redirecting") ? (<><br /> <br /><Link href={redirect_url ? redirect_url : "/nav"}>If not redirect automatically, please click here.</Link></>) : ""}
         </div>
     );
 }

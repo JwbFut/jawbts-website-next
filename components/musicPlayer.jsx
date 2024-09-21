@@ -6,7 +6,7 @@ import {
     PauseIcon
 } from '@heroicons/react/24/outline';
 import { use, useEffect, useRef, useState } from 'react';
-import { getApiUrl } from "./serverActions";
+import { getApiUrl, getDomesticApiUrl } from "./serverActions";
 import { useCookies } from "react-cookie";
 import Utils from "./utils";
 import EventBus from "./eventBus";
@@ -91,7 +91,7 @@ export default function MusicPlayer() {
 
         const f = async function () {
             audioRef.current.pause();
-            audioRef.current.src = await getApiUrl() + "/music/get?id=" + curPlayingId + "&token=" + cookie.token + "&timestamp=" + Date.now();
+            audioRef.current.src = await getDomesticApiUrl(cookie.token) + "/music/get?id=" + curPlayingId + "&token=" + cookie.token + "&timestamp=" + Date.now();
             if (firstCall) {
                 setFirstCall(false);
             } else {
@@ -140,7 +140,7 @@ export default function MusicPlayer() {
 
         audioRef.current.currentTime = 0;
         // console.log(Date.now(), "start", audioRef.current.currentTime);
-        new Promise(resolve => setTimeout(resolve, 10000)).then(() => {
+        new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
             // console.log(Date.now(), "end");
             // console.log(audioRef.current.currentTime, audioRef.current.readyState);
             if (0 < audioRef.current.currentTime && audioRef.current.readyState >= 2) return;

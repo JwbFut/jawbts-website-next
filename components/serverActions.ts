@@ -123,3 +123,9 @@ export async function fetchApiPost(url: string, token: string | null, data: any)
 export async function getApiUrl() {
     return process.env.API_URL;
 }
+
+export async function getDomesticApiUrl(token: string) {
+    let res = await getProfile(token);
+    if (typeof res === "string" || res["code"] != "Success") return "";
+    return process.env.DOMESTIC_API_URL;
+}

@@ -1,7 +1,7 @@
 "use client"
 
 import EventBus from "@/components/eventBus";
-import { fetchBase64 } from "@/components/serverActions";
+import { fetchBase64, getDomesticApiUrl } from "@/components/serverActions";
 import Utils from "@/components/utils";
 import { PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -28,7 +28,7 @@ export default function Page() {
     useEffect(() => {
         const f = async () => {
             if (curPlayingInfo.code === "unfinished" || !curPlayingInfo.data.cover) return;
-            const s = await Utils.arrayBufferToDataURL(Utils.base64ToUint8Array(await fetchBase64(curPlayingInfo.data.cover)));
+            const s = getDomesticApiUrl(cookie.token) + "/net/proxy?url=" + curPlayingInfo.data.cover;
             setImgUrl(s);
         };
         f();

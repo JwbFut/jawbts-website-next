@@ -100,12 +100,11 @@ export default function Page() {
             </div>
             <div className="grid grid-cols-3 gap-4 bg-[#313131] rounded-lg my-10">
                 <div className="">
-                    <Image
+                    <img
                         src={proc_profile()["avatar_url"]}
                         alt="avatar"
                         width={500}
                         height={500}
-                        priority={true}
                         className="rounded-lg"
                     />
                 </div>

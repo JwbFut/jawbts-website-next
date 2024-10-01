@@ -38,7 +38,7 @@ export default function Navbar() {
                 <div className="flex lg:flex-1">
                     <Link href="#" className="-m-1.5 p-1.5">
                         <span className="sr-only">Jawbts</span>
-                        <Image height={8} width={8} alt="" src="https://cdn.jawbts.org/photos/logo.png" className="h-8 w-auto" />
+                        <img height={8} width={8} alt="" src="https://cdn.jawbts.org/photos/logo.png" className="h-8 w-auto" />
                     </Link>
                 </div>
                 <div className="flex lg:hidden">
@@ -106,7 +106,7 @@ export default function Navbar() {
                     <div className="flex items-center justify-between">
                         <Link href="#" className="-m-1.5 p-1.5">
                             <span className="sr-only">Jawbts</span>
-                            <Image
+                            <img
                                 height={8}
                                 width={8}
                                 alt=""

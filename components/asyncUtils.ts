@@ -1,6 +1,5 @@
 "use client"
 
-import { it } from "node:test";
 import { fetchApiGet } from "./serverActions";
 
 class Asyncer {

@@ -23,7 +23,8 @@ export default function MusicPlayer() {
         data: {
             title: "未知歌曲",
             author: "未知歌手",
-            cover: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC"
+            cover: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC",
+            inner_id: "###",
         }
     });
     const progressBarRef = useRef(null);
@@ -100,7 +101,9 @@ export default function MusicPlayer() {
             }
         }
         const f_2 = async function () {
-            setCurPlayingInfo(await (await fetch(await getApiUrl() + "/music/get/info?id=" + curPlayingId + "&token=" + cookie.token)).json());
+            let k = await (await fetch(await getApiUrl() + "/music/get/info?id=" + curPlayingId + "&token=" + cookie.token)).json();
+            if (k.data) k.data.inner_id = curPlayingId;
+            setCurPlayingInfo(k);
         }
 
         f();
@@ -140,11 +143,17 @@ export default function MusicPlayer() {
 
         audioRef.current.currentTime = 0;
         // console.log(Date.now(), "start", audioRef.current.currentTime);
-        new Promise(resolve => setTimeout(resolve, 5000)).then(() => {
+        new Promise(resolve => setTimeout(resolve, 5000)).then(async () => {
+            if (!audioRef.current) return;
             // console.log(Date.now(), "end");
             // console.log(audioRef.current.currentTime, audioRef.current.readyState);
             if (0 < audioRef.current.currentTime && audioRef.current.readyState >= 2) return;
-            audioRef.current.load();
+            try {
+                await audioRef.current.load();
+            } catch (e) {
+                console.log(e);
+                return;
+            }
             audioRef.current.play();
             // console.log("load again");
             onDurationChange();
@@ -175,7 +184,7 @@ export default function MusicPlayer() {
     }, [curPlayingInfo]);
 
     return (
-        <header className="bg-[#16161a] w-full bottom-0 fixed">
+        <header className="bg-[#16161a] w-full bottom-0 fixed select-none">
             <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2">
                 <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onDurationChange={onDurationChange} hidden preload="auto"></audio>
                 <div className="hidden lg:col-span-1 lg:inline">

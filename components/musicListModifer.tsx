@@ -5,7 +5,7 @@ import { musicDataAsyncer } from "./asyncUtils";
 import { fetchApiPost } from "./serverActions";
 import { useCookies } from "react-cookie";
 
-export default function MusicListModifier() {
+export default function MusicListModifier(props: any) {
     const [cookie, setCookie] = useCookies(["username", "token"]);
     const [musicList, setMusicList] = useState(new Array<any>(0));
     const [musicListSelectedStatus, setMusicListSelectedStatus] = useState(new Array<Boolean>(0));
@@ -14,6 +14,7 @@ export default function MusicListModifier() {
     const [deletedMusicList, setDeletedMusicList] = useState(new Array<any>(0));
     const [localMusicList, setLocalMusicList] = useState(new Array<any>(0));
     const [mode, setMode] = useState("modify");
+    const [innerIdFilter, setInnerIdFilter] = useState("");
 
     useEffect(() => {
         setLocalMusicList(musicDataAsyncer.get());
@@ -27,7 +28,7 @@ export default function MusicListModifier() {
     EventBus.removeAllListeners("musicListModifier_updateMusicList");
     EventBus.on("musicListModifier_updateMusicList", (data) => {
         setMusicList(data);
-        setMusicDisplayList(data);
+        if (!props.enableInnerIdSelect) setMusicDisplayList(data);
     });
 
     EventBus.removeAllListeners("musicListModifier_setMode");
@@ -49,6 +50,12 @@ export default function MusicListModifier() {
             return findDeletedIndex(value) == -1 && findLocalIndex(value) == -1;
         });
         data(musicList_updated);
+    });
+
+    EventBus.removeAllListeners("musicListModifier_setSelectedMusic");
+    EventBus.on("musicListModifier_setSelectedMusic", (data) => {
+        if (!props.enableInnerIdSelect) return;
+        setInnerIdFilter(data["inner_id"]);
     });
 
     function getMusicBgColorHtml(music: any) {
@@ -211,7 +218,13 @@ export default function MusicListModifier() {
         onFilterChange();
     }
 
+    useEffect(() => {
+        onFilterChange();
+    }, [innerIdFilter]);
+
     function onFilterChange() {
+        if (!musicList) return;
+
         let displayListUpdated = Array.from(musicDisplayList);
         let selectListUpdated = Array.from(musicListSelectedStatus);
 
@@ -223,6 +236,9 @@ export default function MusicListModifier() {
                 }
             });
             if (filters.tagsFilter.length == 0 || filters.tagsFilter[0] == "") k = true;
+            if (props.enableInnerIdSelect && (innerIdFilter == "###" || innerIdFilter == "" || innerIdFilter != value.inner_id)) {
+                return false;
+            }
             return filters.nameFilter.test(value.title) && filters.authorFilter.test(value.author) && k;
         });
 
@@ -557,7 +573,7 @@ export default function MusicListModifier() {
                 <div className="col-span-2"></div>
                 <div className="col-span-1"></div>
             </div>
-            <div className="grid grid-rows-1 grid-cols-12 text-gray-300 text-center">
+            <div className="grid grid-rows-1 grid-cols-12 text-gray-300 text-center select-none">
                 <div className="col-span-1"></div>
                 <div className="col-span-3">标题</div>
                 <div className="col-span-2">作者</div>

@@ -9,9 +9,8 @@ import { useEffect } from 'react';
 
 
 export default function Page() {
-    let localMusicList: any[] = [];
     useEffect(() => {
-        localMusicList = musicDataAsyncer.get();
+        let localMusicList: any[] = musicDataAsyncer.get();
         EventBus.emit("musicListModifier_updateMusicList", localMusicList);
     }, []);
 

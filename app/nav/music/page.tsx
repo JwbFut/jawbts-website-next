@@ -37,7 +37,7 @@ export default function Page() {
     return (
         <div className="box-border m-10 mb-15">
             <div className="flex justify-center w-full">
-                <Image
+                <img
                     src={imgUrl}
                     alt="img"
                     width={curPlayingInfo.code == "unfinished" ? 0 : 600}

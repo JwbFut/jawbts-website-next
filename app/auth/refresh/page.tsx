@@ -50,7 +50,8 @@ export default function Page() {
                     setCookie("username", res.data.username, { expires: expire_date, sameSite: "lax", path: "/" });
                     
                     setMes("Redirecting...");
-                    router.push(redirect_url ? redirect_url : "/nav");
+                    // 太快会被中间件踢掉
+                    setTimeout(() => {router.push(redirect_url ? redirect_url : "/nav")}, 1000);
                 }
             } catch(err) {
                 setMes((err as Error).message + " Will Redirect to login page in 12s.");

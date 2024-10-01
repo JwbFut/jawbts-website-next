@@ -52,8 +52,8 @@ export default function Page() {
 
             </div>
             <div className="text-center text-gray-200 pt-5 pb-3 w-full">
-                <p>{curPlayingInfo.code === "unfinished" ? "" : curPlayingInfo.data?.title}</p>
-                <p>{curPlayingInfo.code === "unfinished" ? "" : curPlayingInfo.data?.author}</p>
+                <p>{curPlayingInfo?.code === "unfinished" ? "" : curPlayingInfo?.data?.title}</p>
+                <p>{curPlayingInfo?.code === "unfinished" ? "" : curPlayingInfo?.data?.author}</p>
             </div>
             <div className="w-full flex justify-center px-5 gap-5">
                 <div>

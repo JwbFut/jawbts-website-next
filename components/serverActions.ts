@@ -124,8 +124,20 @@ export async function getApiUrl() {
     return process.env.API_URL;
 }
 
+export async function checkToken(token: string) {
+    try {
+        const res = await fetch(`${process.env.API_URL}/auth/check`, {
+            method: "GET",
+            headers: { "Authorization": "Bearer " + token }
+        });
+        let res_b = await res.json();
+        return res_b["code"] === "Success";
+    } catch (e) {
+        return false;
+    }
+}
+
 export async function getDomesticApiUrl(token: string) {
-    let res = await getProfile(token);
-    if (typeof res === "string" || res["code"] != "Success") return "";
+    if (!await checkToken(token)) return "";
     return process.env.DOMESTIC_API_URL;
 }

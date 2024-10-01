@@ -28,7 +28,7 @@ export default function Page() {
     useEffect(() => {
         const f = async () => {
             if (curPlayingInfo.code === "unfinished" || !curPlayingInfo.data.cover) return;
-            const s = await getDomesticApiUrl(cookie.token) + "/net/proxy?url=" + curPlayingInfo.data.cover;
+            const s = await getDomesticApiUrl(cookie.token) + "/net/proxy?url=" + curPlayingInfo.data.cover + "&token=" + cookie.token;
             setImgUrl(s);
         };
         f();

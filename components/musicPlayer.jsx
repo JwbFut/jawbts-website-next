@@ -18,6 +18,7 @@ export default function MusicPlayer() {
     const [barWidth, setBarWidth] = useState(0);
     const [progressSt, setProgressSt] = useState(0);
     const [curPlayingId, setCurPlayingId] = useState("###");
+    const [localMusicList, setLocalMusicList] = useState([]);
     const [curPlayingInfo, setCurPlayingInfo] = useState({
         code: "unfinished",
         data: {
@@ -32,6 +33,8 @@ export default function MusicPlayer() {
     const progressBarRef = useRef(null);
     const audioRef = useRef(null);
 
+    const [delay, setDelay] = useState(0);
+
     let callFlag_musicDataAsyncer = false;
     // 同步先
     useEffect(() => {
@@ -42,6 +45,13 @@ export default function MusicPlayer() {
             f();
             callFlag_musicDataAsyncer = true;
         }
+    }, []);
+
+    useEffect(() => {
+        setLocalMusicList(musicDataAsyncer.get());
+        if (window) window.setInterval(() => {
+            setLocalMusicList(musicDataAsyncer.get());
+        }, 10000);
     }, []);
 
     let progress = 0, progressBarLength = 1, slideBeginX = 0, progressBegin = 0;
@@ -79,8 +89,10 @@ export default function MusicPlayer() {
 
     // 播放信息同步逻辑
     EventBus.removeAllListeners("musicPlayer_requestMusicInfo");
-    EventBus.on("musicPlayer_requestMusicInfo", () => {
-        EventBus.emit("musicPlayer_musicInfo", curPlayingInfo);
+    EventBus.on("musicPlayer_requestMusicInfo", (excludeId) => {
+        let k = curPlayingInfo;
+        k.excludeId = excludeId;
+        EventBus.emit("musicPlayer_musicInfo", k);
     });
 
     useEffect(() => {
@@ -118,7 +130,18 @@ export default function MusicPlayer() {
                 setFirstCall(false);
             } else {
                 audioRef.current.currentTime = 0;
-                audioRef.current.play();
+                console.log(delay);
+                if (delay <= 0) {
+                    audioRef.current.play();
+                    onDurationChange();
+                } else {
+                    setTimeout(() => {
+                        if (!audioRef.current || audioRef.current.currentTime != 0) return;
+                        audioRef.current.play();
+                        onDurationChange();
+                    }, 1000 * delay);
+                    setDelay(-1);
+                }
             }
         }
         const f_2 = async function () {
@@ -130,9 +153,6 @@ export default function MusicPlayer() {
 
         f();
         f_2();
-
-        onDurationChange();
-
     }, [curPlayingId]);
 
     function onPlayButtonClick(setPlayingStats) {
@@ -198,6 +218,13 @@ export default function MusicPlayer() {
         setTimeout(onPlayButtonClick(bool), 5);
     });
 
+    // 监听更改音量
+    EventBus.removeAllListeners("musicPlayer_setVolume");
+    EventBus.on("musicPlayer_setVolume", (volume) => {
+        if (!audioRef.current) return;
+        audioRef.current.volume = volume / 100;
+    });
+
     // playinfo sync with title & to localstorage & to eventbus
     useEffect(() => {
         // to title
@@ -240,10 +267,46 @@ export default function MusicPlayer() {
         window.setInterval(saveInfoToLocalStorage, 1000);
     }, []);
 
+    // 播放结束后操作
+    function onEnded() {
+        let playingMode = localStorage.getItem("musicPlayerConfig");
+        if (!playingMode) {
+            audioRef.current.pause();
+            setPlaying(false);
+            return;
+        }
+        let playingMode_parsed = JSON.parse(playingMode);
+        switch (playingMode_parsed.playingMode) {
+            case "single_loop":
+                audioRef.current.currentTime = 0;
+                setTimeout(() => {
+                    if (!audioRef.current || audioRef.current.currentTime != 0) return;
+                    audioRef.current.play();
+                }, 1000 * playingMode_parsed.delay);
+                break;
+            case "shuffle":
+                setDelay(playingMode_parsed.delay);
+                let k = localMusicList;
+                let randomIndex = Math.floor(Math.random() * k.length);
+                setCurPlayingId(k[randomIndex].inner_id);
+                break;
+            case "list_loop":
+                setDelay(playingMode_parsed.delay);
+                let e = localMusicList;
+                let index = e.findIndex(x => x.inner_id === curPlayingId);
+                setCurPlayingId(e[(index + 1) % e.length].inner_id);
+                break;
+            default:
+                setPlaying(false);
+                audioRef.current.pause();
+                break;
+        }
+    }
+
     return (
         <header className="bg-[#16161a] w-full bottom-0 fixed select-none">
             <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2">
-                <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onDurationChange={onDurationChange} hidden preload="auto"></audio>
+                <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onDurationChange={onDurationChange} onEnded={onEnded} hidden preload="auto"></audio>
                 <div className="hidden lg:col-span-1 lg:inline">
                     {Utils.secToString(audioRef.current?.currentTime)}
                 </div>

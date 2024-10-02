@@ -18,14 +18,15 @@ export default function Page() {
 
     const [curPlayingInfo, setCurPlayingInfo] = useState({ code: "unfinished", data: { title: "", author: "", cover: "" } });
 
-    EventBus.removeListener("musicPlayer_musicInfo", e_callback);
-    EventBus.on("musicPlayer_musicInfo", e_callback);
-    EventBus.removeAllListeners("musicPlayerPage_musicInfo");
-    EventBus.on("musicPlayerPage_musicInfo", (value: any) => {
-        setCurPlayingInfo(value);
-    });
-
     useEffect(() => {
+        EventBus.removeListener("musicPlayer_musicInfo", e_callback);
+        EventBus.on("musicPlayer_musicInfo", e_callback);
+        EventBus.removeAllListeners("musicPlayerPage_musicInfo");
+        EventBus.on("musicPlayerPage_musicInfo", (value: any) => {
+            if (value.excludeId == "mainPage") return;
+            setCurPlayingInfo(value);
+        });
+        
         EventBus.emit("musicPlayer_requestMusicInfo");
     }, []);
 
@@ -67,13 +68,14 @@ export default function Page() {
                 </div>
                 <div>
                     <Cog6ToothIcon className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer"
-                        onClick={() => setPlayingSettingsExpanded(!playingSettingsExpanded)}   
+                        onClick={() => setPlayingSettingsExpanded(!playingSettingsExpanded)}
                     ></Cog6ToothIcon>
                 </div>
             </div>
             {playingSettingsExpanded && (
                 <MusicPlayingSettings />
             )}
+            
         </div>
     );
 }

@@ -77,7 +77,7 @@ export default function MusicListModifier(props: any) {
         if (data != curPlayingMusic) setCurPlayingMusic(data);
     });
 
-    EventBus.emit("musicPlayer_requestMusicInfo");
+    EventBus.emit("musicPlayer_requestMusicInfo", "mainPage");
 
     // 最右边那个播放按钮
     async function onClickC(event: any, music: any) {
@@ -611,15 +611,15 @@ export default function MusicListModifier(props: any) {
                     <div key={music.title + "C"} className="col-span-2">{(music.author_a ? music.author_a + " : " : "") + music.author}</div>
                     <div key={music.title + "D"} className="col-span-3">{(music.static_tags.concat(music.tags)).toString()}</div>
                     <div key={music.title + "E"} className="col-span-2">
-                        <div className="grid grid-rows-1 grid-cols-3 select-none">
+                        <div className="grid grid-rows-1 grid-cols-3 select-none justify-center">
                             <div className="col-span-1 flex items-center justify-center">
-                                <MinusIcon className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer"
+                                <MinusIcon className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer justify-center"
                                     onClick={(event) => onMinLikes(event, music)}
                                 ></MinusIcon>
                             </div>
                             <div className="col-span-1 flex items-center justify-center">{music.likes}</div>
                             <div className="col-span-1 flex items-center justify-center">
-                                <PlusIcon className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer"
+                                <PlusIcon className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer justify-center"
                                     onClick={(event) => onAddLikes(event, music)}
                                 ></PlusIcon>
                             </div>

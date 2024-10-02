@@ -8,9 +8,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-let ee_callback_value: any = null;
 const e_callback = (value: any) => {
-    ee_callback_value = value;
+    EventBus.emit("musicPlayerPage_musicInfo", value);
 }
 
 export default function Page() {
@@ -19,11 +18,12 @@ export default function Page() {
 
     const [curPlayingInfo, setCurPlayingInfo] = useState({ code: "unfinished", data: { title: "", author: "", cover: "" } });
 
-    useEffect(() => {
-        setCurPlayingInfo(ee_callback_value);
-    }, [ee_callback_value]);
     EventBus.removeListener("musicPlayer_musicInfo", e_callback);
     EventBus.on("musicPlayer_musicInfo", e_callback);
+    EventBus.removeAllListeners("musicPlayerPage_musicInfo");
+    EventBus.on("musicPlayerPage_musicInfo", (value: any) => {
+        setCurPlayingInfo(value);
+    });
 
     useEffect(() => {
         EventBus.emit("musicPlayer_requestMusicInfo");
@@ -31,7 +31,7 @@ export default function Page() {
 
     useEffect(() => {
         const f = async () => {
-            if (curPlayingInfo.code === "unfinished" || !curPlayingInfo.data.cover) return;
+            if (!curPlayingInfo || curPlayingInfo.code === "unfinished" || !curPlayingInfo.data.cover) return;
             const s = await getDomesticApiUrl(cookie.token) + "/net/proxy?url=" + curPlayingInfo.data.cover + "&token=" + cookie.token;
             setImgUrl(s);
         };
@@ -41,7 +41,7 @@ export default function Page() {
     const [playingSettingsExpanded, setPlayingSettingsExpanded] = useState(false);
 
     return (
-        <div className="box-border m-10 pb-20">
+        <div className="box-border m-6 pb-15">
             <div className="flex justify-center w-full">
                 <img
                     src={imgUrl}
@@ -49,7 +49,6 @@ export default function Page() {
                     width={curPlayingInfo?.code == "unfinished" ? 0 : 600}
                     height={curPlayingInfo?.code == "unfinished" ? 0 : 600}
                 />
-
             </div>
             <div className="text-center text-gray-200 pt-5 pb-3 w-full">
                 <p>{curPlayingInfo?.code === "unfinished" ? "" : curPlayingInfo?.data?.title}</p>

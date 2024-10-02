@@ -5,6 +5,10 @@ import { musicDataAsyncer } from "./asyncUtils";
 import { fetchApiPost } from "./serverActions";
 import { useCookies } from "react-cookie";
 
+const f_mi_callback = (data: any) => {
+    EventBus.emit("musicListModifier_updateMusicInfo", data);
+}
+
 export default function MusicListModifier(props: any) {
     const [cookie, setCookie] = useCookies(["username", "token"]);
     const [musicList, setMusicList] = useState(new Array<any>(0));
@@ -55,6 +59,7 @@ export default function MusicListModifier(props: any) {
     EventBus.removeAllListeners("musicListModifier_setSelectedMusic");
     EventBus.on("musicListModifier_setSelectedMusic", (data) => {
         if (!props.enableInnerIdSelect) return;
+        if (innerIdFilter == data["inner_id"]) return;
         setInnerIdFilter(data["inner_id"]);
     });
 
@@ -63,6 +68,16 @@ export default function MusicListModifier(props: any) {
         if (findDeletedIndex(music) != -1) return "bg-[#191919]";
         return musicListSelectedStatus[findIndex(music)] ? "bg-[#515151] hover:bg-[#555555]" : "hover:bg-[#353535]"
     }
+
+    // 同步播放信息
+    EventBus.removeListener("musicPlayer_musicInfo", f_mi_callback);
+    EventBus.on("musicPlayer_musicInfo", f_mi_callback);
+    EventBus.removeAllListeners("musicListModifier_updateMusicInfo");
+    EventBus.on("musicListModifier_updateMusicInfo", (data) => {
+        if (data != curPlayingMusic) setCurPlayingMusic(data);
+    });
+
+    EventBus.emit("musicPlayer_requestMusicInfo");
 
     // 最右边那个播放按钮
     async function onClickC(event: any, music: any) {
@@ -611,14 +626,14 @@ export default function MusicListModifier(props: any) {
                         </div>
                     </div>
                     <div key={music.title + "F"} className="col-span-1 flex items-center justify-center">
-                        {curPlayingMusic != music ? (
-                            <PlayIcon key={music.title + "G"} className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer"
-                                onClick={(event) => onClickC(event, music)}
-                            ></PlayIcon>
-                        ) : (
+                        {curPlayingMusic && curPlayingMusic["data"] && !curPlayingMusic["paused"] && curPlayingMusic["data"]["inner_id"] == music.inner_id ? (
                             <PauseIcon key={music.title + "G"} className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer"
                                 onClick={() => { EventBus.emit("playMusic", false); setCurPlayingMusic(null); }}
                             ></PauseIcon>
+                        ) : (
+                            <PlayIcon key={music.title + "G"} className="h-10 w-10 text-gray-300 group-hover:text-gray-200 cursor-pointer"
+                                onClick={(event) => onClickC(event, music)}
+                            ></PlayIcon>
                         )}
                     </div>
                 </div>

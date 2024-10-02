@@ -25,8 +25,10 @@ export default function MusicPlayer() {
             author: "未知歌手",
             cover: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC",
             inner_id: "###",
-        }
+        },
+        paused: true,
     });
+    const [infoChangeCuzReload, setInfoChangeCuzReload] = useState(false);
     const progressBarRef = useRef(null);
     const audioRef = useRef(null);
 
@@ -82,18 +84,37 @@ export default function MusicPlayer() {
     });
 
     useEffect(() => {
-        EventBus.emit("musicPlayer_musicInfo", curPlayingInfo);
-    }, [curPlayingInfo]);
+        let k = JSON.parse(JSON.stringify(curPlayingInfo));
+        k.paused = !playing;
+        setCurPlayingInfo(k);
+    }, [playing]);
 
     // 播放逻辑
     const [firstCall, setFirstCall] = useState(true);
     useEffect(() => {
-        if (curPlayingId === "###") return;
+        if (curPlayingId === "###") {
+            if (!localStorage) return;
+            let musicInfo = localStorage.getItem("musicPlayerInfo");
+            if (!musicInfo) return;
+            let musicInfoParsed = JSON.parse(musicInfo);
+            if (!musicInfoParsed.info) return;
+            setInfoChangeCuzReload(true);
+            setCurPlayingId(musicInfoParsed.info.inner_id);
+            return;
+        }
 
         const f = async function () {
             audioRef.current.pause();
             audioRef.current.src = await getDomesticApiUrl(cookie.token) + "/music/get?id=" + curPlayingId + "&token=" + cookie.token + "&timestamp=" + Date.now();
             if (firstCall) {
+                if (localStorage) {
+                    let musicInfo = localStorage.getItem("musicPlayerInfo");
+                    if (musicInfo) {
+                        let musicInfoParsed = JSON.parse(musicInfo);
+                        audioRef.current.currentTime = musicInfoParsed.currentTime ? musicInfoParsed.currentTime : 0;
+                    }
+                }
+
                 setFirstCall(false);
             } else {
                 audioRef.current.currentTime = 0;
@@ -103,6 +124,7 @@ export default function MusicPlayer() {
         const f_2 = async function () {
             let k = await (await fetch(await getApiUrl() + "/music/get/info?id=" + curPlayingId + "&token=" + cookie.token)).json();
             if (k.data) k.data.inner_id = curPlayingId;
+            k.paused = false;
             setCurPlayingInfo(k);
         }
 
@@ -176,12 +198,47 @@ export default function MusicPlayer() {
         setTimeout(onPlayButtonClick(bool), 5);
     });
 
-    // playinfo sync with title
+    // playinfo sync with title & to localstorage & to eventbus
     useEffect(() => {
+        // to title
         if (curPlayingInfo.data) {
             document.title = curPlayingInfo.data.title;
         }
+
+        // to eventbus
+        EventBus.emit("musicPlayer_musicInfo", curPlayingInfo);
+
+        // to localstorage
+        if (infoChangeCuzReload && curPlayingInfo.code === "Success") {
+            setInfoChangeCuzReload(false);
+            return;
+        }
+        if (curPlayingInfo.code !== "Success") return;
+        if (!localStorage) return;
+        if (!curPlayingInfo || curPlayingInfo.code !== "Success") {
+            localStorage.removeItem("musicPlayerInfo");
+            return;
+        }
+        localStorage.setItem("musicPlayerInfo", JSON.stringify({
+            info: curPlayingInfo.data,
+            currentTime: 0,
+        }));
     }, [curPlayingInfo]);
+
+    // 把播放信息存到localstorage
+    function saveInfoToLocalStorage() {
+        if (!localStorage || !audioRef.current) return;
+        let k = localStorage.getItem("musicPlayerInfo");
+        if (!k) return;
+        let k_parsed = JSON.parse(k);
+        k_parsed.currentTime = audioRef.current.currentTime;
+        localStorage.setItem("musicPlayerInfo", JSON.stringify(k_parsed));
+    }
+
+    useEffect(() => {
+        if (!window) return;
+        window.setInterval(saveInfoToLocalStorage, 1000);
+    }, []);
 
     return (
         <header className="bg-[#16161a] w-full bottom-0 fixed select-none">

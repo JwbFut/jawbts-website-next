@@ -19,7 +19,7 @@ export default function MusicPlayingSettings() {
     }, []);
     
     return (
-        <div className="bg-[#313131] rounded-lg mt-5">
+        <div className="bg-[#313131] rounded-lg mt-5 mb-40">
             <MusicListModifier enableInnerIdSelect={true} />
         </div>
     )

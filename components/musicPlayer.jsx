@@ -124,7 +124,7 @@ export default function MusicPlayer() {
         const f_2 = async function () {
             let k = await (await fetch(await getApiUrl() + "/music/get/info?id=" + curPlayingId + "&token=" + cookie.token)).json();
             if (k.data) k.data.inner_id = curPlayingId;
-            k.paused = false;
+            k.paused = !playing;
             setCurPlayingInfo(k);
         }
 

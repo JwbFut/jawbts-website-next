@@ -130,13 +130,17 @@ export default function MusicPlayer() {
                 setFirstCall(false);
             } else {
                 audioRef.current.currentTime = 0;
-                console.log(delay);
+                // audioRef.current.pause();
+                // setPlaying(false);
+                // console.log(delay);
                 if (delay <= 0) {
                     audioRef.current.play();
                     onDurationChange();
                 } else {
                     setTimeout(() => {
+                        // console.log("now play");
                         if (!audioRef.current || audioRef.current.currentTime != 0) return;
+                        // console.log("play again");
                         audioRef.current.play();
                         onDurationChange();
                     }, 1000 * delay);
@@ -306,7 +310,7 @@ export default function MusicPlayer() {
     return (
         <header className="bg-[#16161a] w-full bottom-0 fixed select-none">
             <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2">
-                <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onDurationChange={onDurationChange} onEnded={onEnded} hidden preload="auto"></audio>
+                <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onEnded={onEnded} hidden preload="auto"></audio>
                 <div className="hidden lg:col-span-1 lg:inline">
                     {Utils.secToString(audioRef.current?.currentTime)}
                 </div>

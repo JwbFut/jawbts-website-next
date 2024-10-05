@@ -165,6 +165,9 @@ export default function MusicPlayer() {
         setPlaying(setPlayingStats);
         if (setPlayingStats) {
             audioRef.current.play();
+            if (audioRef.current.currentTime === 0) {
+                onDurationChange();
+            }
         } else {
             audioRef.current.pause();
         }
@@ -189,7 +192,7 @@ export default function MusicPlayer() {
 
         audioRef.current.currentTime = 0;
         // console.log(Date.now(), "start", audioRef.current.currentTime);
-        new Promise(resolve => setTimeout(resolve, 5000)).then(async () => {
+        new Promise(resolve => setTimeout(resolve, 3000)).then(async () => {
             if (!audioRef.current) return;
             // console.log(Date.now(), "end");
             // console.log(audioRef.current.currentTime, audioRef.current.readyState);

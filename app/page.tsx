@@ -117,7 +117,7 @@ export default function Home() {
                     <footer className="transition my-5 text-[rgba(255,255,255,0)] hover:text-[rgba(255,255,255,1)]">
                         {error && <div style={{ color: 'red' }}>{error}</div>}
                         <form onSubmit={onSubmid}>
-                            <input className="my-5 bg-[rgba(0,0,0,0)] text-center" type="password" name="username" disabled={cookieExist || loading}></input> <br />
+                            <input className="my-5 bg-[rgba(0,0,0,0)] text-center" type="password" name="username" autoComplete="password" disabled={cookieExist || loading}></input> <br />
                             <button className="transition border-2 border-[rgba(0,0,0,0)] hover:border-white h-10 w-20 text-lg"
                                 type="submit" disabled={loading} hidden={cookieExist}>
                                 {loading ? "加载中..." : "登录"}

@@ -48,7 +48,7 @@ export default function Page() {
                     src={imgUrl}
                     alt="Music Cover"
                     width={curPlayingInfo?.code == "unfinished" ? 0 : 600}
-                    height={curPlayingInfo?.code == "unfinished" ? 0 : 600}
+                    height={curPlayingInfo?.code == "unfinished" ? 0 : 300}
                 />
             </div>
             <div className="text-center text-gray-200 pt-5 pb-3 w-full">

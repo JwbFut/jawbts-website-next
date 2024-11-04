@@ -21,7 +21,38 @@ export default function MusicListModifier(props: any) {
     const [innerIdFilter, setInnerIdFilter] = useState("");
 
     useEffect(() => {
-        setLocalMusicList(musicDataAsyncer.get());
+        let musicListLocalTemp = musicDataAsyncer.get();
+        setLocalMusicList(musicListLocalTemp);
+
+        // 长度为零就不管
+        if (musicList.length == 0) return;
+
+        // musicList中, 若也存在localmusiclist内的元素, 就把那个元素放到musicList开头, 否则什么都不干
+        let musicList_updated = new Array<any>(0);
+        for (let i = 0; i < musicList.length; i++) {
+            let index = findIndexFromList(musicList[i], musicListLocalTemp);
+            if (index == -1) {
+                musicList_updated.push(musicList[i]);
+            }
+        }
+        for (let i = 0; i < musicList.length; i++) {
+            let index = findIndexFromList(musicList[i], musicList_updated);
+            if (index == -1) {
+                musicList_updated.push(musicList[i]);
+            }
+        }
+        // console.log(musicList_updated);
+        // console.log(musicList);
+        let changeFlag = false;
+        for (let i = 0; i < musicList_updated.length && i < musicList.length && changeFlag == false; i++) {
+            if (musicList_updated[i]["inner_id"] != musicList[i]["inner_id"]) {
+                changeFlag = true;
+            }
+        }
+        if (changeFlag && (musicList_updated.length == musicList.length)) {
+            // console.log("changeFlag!!!");
+            setMusicList(musicList_updated);
+        }
     }, [musicList]);
 
     useEffect(() => {
@@ -50,7 +81,7 @@ export default function MusicListModifier(props: any) {
     EventBus.removeAllListeners("musicListModifier_getMusicList");
     EventBus.on("musicListModifier_getMusicList", (data) => {
         let musicList_updated = Array.from(musicList);
-        musicList_updated.filter((value) => {
+        musicList_updated = musicList_updated.filter((value) => {
             return findDeletedIndex(value) == -1 && findLocalIndex(value) == -1;
         });
         data(musicList_updated);
@@ -88,31 +119,21 @@ export default function MusicListModifier(props: any) {
     }
 
     function findIndex(music: any) {
-        let index = -1;
-        for (let i = 0; i < musicList.length; i++) {
-            if (musicList[i]["inner_id"] == music["inner_id"]) {
-                index = i;
-                break;
-            }
-        }
-        return index;
+        return findIndexFromList(music, musicList);
     }
 
     function findDeletedIndex(music: any) {
-        let index = -1;
-        for (let i = 0; i < deletedMusicList.length; i++) {
-            if (deletedMusicList[i]["inner_id"] == music["inner_id"]) {
-                index = i;
-                break;
-            }
-        }
-        return index;
+        return findIndexFromList(music, deletedMusicList);
     }
 
     function findLocalIndex(music: any) {
+        return findIndexFromList(music, localMusicList);
+    }
+
+    function findIndexFromList(music: any, list: any[]) {
         let index = -1;
-        for (let i = 0; i < localMusicList.length; i++) {
-            if (localMusicList[i]["inner_id"] == music["inner_id"]) {
+        for (let i = 0; i < list.length; i++) {
+            if (list[i]["inner_id"] == music["inner_id"]) {
                 index = i;
                 break;
             }
@@ -127,6 +148,7 @@ export default function MusicListModifier(props: any) {
 
         if (findLocalIndex(music) != -1 && mode == "add") return;
         if (findDeletedIndex(music) != -1) return;
+        if (event.shiftKey == 1) return;
 
         if (event.ctrlKey == 1) {
             if (selectStartFrom == -1) {

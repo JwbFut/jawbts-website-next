@@ -1,7 +1,19 @@
 ## Jawbts Webste Next
-基于next.js框架的网站, 应当被部署在vercel的serverless服务上.
 
-## 请看默认readme在这里叨叨
+自己写的小网站罢了.
+
+**功能** 
+
+- 完整的身份验证系统, 对接github oauth2.0, 轮换jwk以及refresh token.
+- 个人档案(其实就是个个性签名)
+- 听音乐的
+
+## 部署相关
+
+注意, 它需要联动后端, 也就是[Jawbts API Next](https://github.com/winsrewu/jawbts-api-next/).  
+请参照.env.example文件配置环境变量.  
+关于api和api-domestic的区别, 参阅API的README.md.  
+注意, origin指的是你这个服务部署的url, 也就是你访问这个网站的url.  
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

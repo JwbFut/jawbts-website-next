@@ -43,7 +43,13 @@ export default function Page() {
 
         const refresh = async function () {
             try {
-                let res = await refreshJwt(ref_token, username);
+                let hashed_ref_token = new Uint8Array(await window.crypto.subtle.digest("SHA-512", new TextEncoder().encode(ref_token + username)));
+                let b64 = "";
+                let len = hashed_ref_token.byteLength;
+                for (let i = 0; i < len; i++) {
+                    b64 += String.fromCharCode(hashed_ref_token[i]);
+                }
+                let res = await refreshJwt(encodeURIComponent(btoa(b64)), username);
                 if (res.code != "Success") {
                     setMes(res.code + ". " + (res.data?.reason ? res.data.reason : ""));
                     setRejected(true);

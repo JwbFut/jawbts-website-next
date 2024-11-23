@@ -24,7 +24,7 @@ export default function MusicPlayer() {
         data: {
             title: "未知歌曲",
             author: "未知歌手",
-            cover: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC",
+            cover: Utils.nonePNG,
             inner_id: "###",
         },
         paused: true,

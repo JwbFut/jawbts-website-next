@@ -19,7 +19,7 @@ export default function Page() {
         if (!profile) return {
             "id": "Loading...",
             "username": "Loading...",
-            "avatar_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC",
+            "avatar_url": Utils.nonePNG,
             "description": "",
             "ref_tokens": [
                 {

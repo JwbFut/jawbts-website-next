@@ -1,7 +1,5 @@
 "use server"
 
-import Utils from "./utils";
-
 export async function getBannerText() {
     try {
         const res = await fetch(`${process.env.API_URL}/text`);
@@ -24,6 +22,15 @@ export async function submitLoginForm(username: string, userAgent: string | null
 export async function verifyGithubLoginRedirect(state: string, token: string) {
     try {
         const res = await fetch(`${process.env.API_URL}/auth/github/callback?state=${state}&code=${token}`);
+        return await res.json();
+    } catch (e) {
+        return (e as Error).message;
+    }
+}
+
+export async function verifyOTPLoginRedirect(state: string, token: string, username: string, userAgent: string | null) {
+    try {
+        const res = await fetch(`${process.env.API_URL}/auth/otp/callback?state=${state}&code=${token}&username=${username}`, { headers: { "User-Agent": userAgent ? userAgent : "" } });
         return await res.json();
     } catch (e) {
         return (e as Error).message;
@@ -70,13 +77,10 @@ export async function removeRefreshToken(token: string, desc_c: string) {
     }
 }
 
-export async function fetchBase64(url: string) {
-    return Utils.arrayBufferToBase64(await (await fetch(url)).arrayBuffer());
-}
-
-export async function fetchJson(url: string) {
+export async function fetchJson(url: string, userAgent: string | null = "") {
+    let actual_ua = userAgent ? userAgent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0";
     try {
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0"} });
+        const res = await fetch(url, { headers: { "User-Agent": actual_ua} });
         return await res.json();
     } catch (e) {
         return (e as Error).message;
@@ -96,10 +100,10 @@ export async function addMusic(token: string, musics: any) {
     }
 }
 
-export async function fetchApiGet(url: string, token: string | null) {
+export async function fetchApiGet(url: string, token: string | null, userAgent: string | null = "") {
     try {
         const res = await fetch(`${process.env.API_URL}/${url}`, {
-            headers: { "Authorization": "Bearer " + token }
+            headers: { "Authorization": "Bearer " + token, "User-Agent": userAgent ? userAgent : "" }
         });
         return await res.json();
     } catch (e) {
@@ -107,12 +111,12 @@ export async function fetchApiGet(url: string, token: string | null) {
     }
 }
 
-export async function fetchApiPost(url: string, token: string | null, data: any) {
+export async function fetchApiPost(url: string, token: string | null, data: any, userAgent: string | null = "") {
     try {
         const res = await fetch(`${process.env.API_URL}/${url}`, {
             method: "POST",
             body: JSON.stringify(data),
-            headers: { "Authorization": "Bearer " + token }
+            headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json", "User-Agent": userAgent ? userAgent : "" }
         });
         return await res.json();
     } catch (e) {

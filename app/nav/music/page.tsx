@@ -3,6 +3,7 @@
 import EventBus from "@/components/eventBus";
 import MusicPlayingSettings from "@/components/musicPlayingSettings";
 import { getDomesticApiUrl } from "@/components/serverActions";
+import Utils from "@/components/utils";
 import { PencilSquareIcon, PlusIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ const e_callback = (value: any) => {
 
 export default function Page() {
     const [cookie, setCookie] = useCookies(["username", "token"]);
-    const [imgUrl, setImgUrl] = useState("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC");
+    const [imgUrl, setImgUrl] = useState(Utils.nonePNG);
 
     const [curPlayingInfo, setCurPlayingInfo] = useState({ code: "unfinished", data: { title: "", author: "", cover: "" } });
 

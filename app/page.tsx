@@ -68,26 +68,6 @@ export default function Home() {
                 return;
             }
 
-            if (username.includes("@")) {
-                let strs = username.split("@");
-                if (strs.length != 3) {
-                    setError("format of 'username' is not correct.");
-                    setLoading(false);
-                    return;
-                }
-
-                let expire_date = new Date(9999, 1);
-                setCookie("token", "thisisatokenbelieveme", { expires: expire_date, sameSite: "lax", path: "/" });
-                setCookie("username", strs[0], { expires: expire_date, sameSite: "lax", path: "/" });
-                setCookie("client_id", strs[1], { expires: expire_date, sameSite: "lax", path: "/" });
-                localStorage.setItem("ref_token", strs[2]);
-
-                setLoading(false);
-                router.push("/auth/refresh");
-
-                return;
-            }
-
             const res = await submitLoginForm(username, window.navigator.userAgent);
             if (res.code != "Success") {
                 setError(res.data.reason);

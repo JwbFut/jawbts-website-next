@@ -57,7 +57,7 @@ export default function Page() {
                 setQRError(res.data.reason);
                 return;
             }
-            window.navigator.clipboard.writeText(res.data.url);
+            if (event.ctrlKey) window.navigator.clipboard.writeText(res.data.url);
             setQrCodeBase64(await generateQRCode(res.data.url));
         } catch (e) {
             setQRError((e as Error).message);
@@ -123,7 +123,7 @@ export default function Page() {
                 </div>
                 <div className="basis-2/3">
                     <h3 className="text-[#f3f3f3] w-full text-center my-3 text-xl font-semibold">一次性密码</h3>
-                    <p className="text-[#f3f3f3]">扫码登录, 一分钟后失效; 同时自动复制到剪贴板, 打开那个链接也行</p>
+                    <p className="text-[#f3f3f3]">扫码登录, 一分钟后失效; 若按下ctrl, 则同时自动复制到剪贴板, 打开那个链接也行</p>
                     <button className="border-2 my-3 h-8 w-16 text-lg text-[#f3f3f3] mx-5"
                         onClick={getQRCode} disabled={qRLoading}>
                         获取

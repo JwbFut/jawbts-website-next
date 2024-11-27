@@ -32,7 +32,7 @@ export default function Home() {
 
         const get_banner_text = async () => {
             let banner_text = await getBannerText();
-            if (banner_text instanceof Error) {
+            if (!banner_text.data || !banner_text.data.a) {
                 console.log("[ERROR] Fectch failed.");
                 console.log(banner_text);
 
@@ -54,7 +54,7 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    async function onSubmid(event: FormEvent<HTMLFormElement>) {
+    async function onSubmit(event: FormEvent<HTMLFormElement>) {
         try {
             setLoading(true);
             setError("");
@@ -96,7 +96,7 @@ export default function Home() {
                     </div>
                     <footer className="transition my-5 text-[rgba(255,255,255,0)] hover:text-[rgba(255,255,255,1)]">
                         {error && <div style={{ color: 'red' }}>{error}</div>}
-                        <form onSubmit={onSubmid}>
+                        <form onSubmit={onSubmit}>
                             <input className="my-5 bg-[rgba(0,0,0,0)] text-center" type="text" name="username" autoComplete="username" disabled={cookieExist || loading}></input> <br />
                             <button className="transition border-2 border-[rgba(0,0,0,0)] hover:border-white h-10 w-20 text-lg"
                                 type="submit" disabled={loading} hidden={cookieExist}>

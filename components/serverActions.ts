@@ -5,8 +5,8 @@ export async function getBannerText() {
         const res = await fetch(`${process.env.API_URL}/text`);
         if (!res.ok) throw Error("Fetch failed. Response not ok.");
         return await res.json();
-    } catch (err) {
-        return err;
+    } catch (e) {
+        return (e as Error).message;;
     }
 }
 

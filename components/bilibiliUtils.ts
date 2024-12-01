@@ -58,7 +58,7 @@ export default class BiliBiliUtils {
     }
 
     static async getCollections(id: string) {
-        let res = await fetchJson("https://api.bilibili.com/x/polymer/web-space/seasons_archives_list?mid=0&season_id=" + id);
+        let res = await fetchJson("https://api.bilibili.com/x/polymer/web-space/seasons_archives_list?mid=0&page_num=1&page_size=30&season_id=" + id);
         if (typeof res == "string") return res;
         if (res.code != 0) return res.message;
         let aid_first = res.data.aids[0];

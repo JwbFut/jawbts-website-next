@@ -12,7 +12,6 @@ jobs:
         steps:
             - name: Checkout
                 uses: actions/checkout@v2
-
             - name: Deploy to Vercel
                 uses: BetaHuhn/deploy-to-vercel-action@v1.10.0
                 with:

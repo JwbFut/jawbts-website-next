@@ -8,9 +8,10 @@ interface RedirecterProps {
     urlApproved: string;
     urlRejected: string;
     reason: string;
+    error: boolean;
 }
 
-export const Redirecter: React.FC<RedirecterProps> = ({ startCountdownApproved, startCountdownRejeced, urlApproved, urlRejected, reason }) => {
+export const Redirecter: React.FC<RedirecterProps> = ({ startCountdownApproved, startCountdownRejeced, urlApproved, urlRejected, reason, error }) => {
     const [time, setTime] = useState(10);
     const [bootTimer, setBootTimer] = useState(false);
     const router = useRouter();
@@ -42,11 +43,12 @@ export const Redirecter: React.FC<RedirecterProps> = ({ startCountdownApproved, 
     return (
         <div>
             {time > 0 && (startCountdownApproved || startCountdownRejeced) && <p>Redirecting in {time} seconds...</p>}
-            {time === 0 && <p>Redirecting...</p>}
+            {time === 0 && (!error) && <p>Redirecting...</p>}
             {reason && <p>{reason}</p>}
             <br />
-            <p>If you are not redirected automatically,
-                please click <b><a href={urlApproved ? urlApproved : urlRejected}>here</a></b> or fresh the page.</p>
+            {(!error) && <p>If you are not redirected automatically,
+                please click <b><a href={urlApproved ? urlApproved : urlRejected}>here</a></b> or fresh the page.</p>}
+            {error && <p>An error occurred while redirecting. Please refresh the page or try again later.</p>}
         </div>
     )
 }

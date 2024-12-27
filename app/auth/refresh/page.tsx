@@ -7,12 +7,13 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
 export default function Page() {
-    const [ mes, setMes ] = useState("Refreshing your token...");
-    const [ approved, setApproved ] = useState(false);
-    const [ rejeced, setRejected ] = useState(false);
+    const [mes, setMes] = useState("Refreshing your token...");
+    const [approved, setApproved] = useState(false);
+    const [rejeced, setRejected] = useState(false);
     const router = useRouter();
-    const [ cookie, setCookie ] = useCookies(["username", "token", "client_id"]);
+    const [cookie, setCookie] = useCookies(["username", "token", "client_id"]);
     const redirect_url = useSearchParams().get("redirect_url");
+    const [isError, setIsError] = useState(false);
 
     let expire_date = new Date();
     expire_date.setDate(expire_date.getDate() - 1);
@@ -58,14 +59,13 @@ export default function Page() {
                     let expire_date = new Date(9999, 1);
                     setCookie("token", res.data.jwt, { expires: expire_date, sameSite: "lax", path: "/" });
                     setCookie("username", res.data.username, { expires: expire_date, sameSite: "lax", path: "/" });
-                    
+
                     setMes("Success");
                     setApproved(true);
                 }
-            } catch(err) {
+            } catch (err) {
                 setMes((err as Error).name + ": " + (err as Error).message);
-                rm_token();
-                setRejected(true);
+                setIsError(true);
             }
         }
 
@@ -79,7 +79,7 @@ export default function Page() {
         <div className="absolute m-auto inset-x-0 inset-y-0 w-1/2 h-1/2 text-gray-100 text-center text-xl">
             Token Refresh Page. <br /><br />
             <Redirecter startCountdownApproved={approved} startCountdownRejeced={rejeced} urlApproved={redirect_url ? redirect_url : "/nav"}
-                urlRejected={"/"} reason={mes} />
+                urlRejected={"/"} reason={mes} error={isError} />
         </div>
     );
 }

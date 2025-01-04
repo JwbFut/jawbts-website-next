@@ -25,11 +25,13 @@ export default function MusicPlayingSettings() {
 
         let localMusicList: any[] = musicDataAsyncer.get();
         EventBus.emit("musicListModifier_updateMusicList", localMusicList);
-        
+
         EventBus.removeListener("musicPlayer_musicInfo", f_callback);
         EventBus.on("musicPlayer_musicInfo", f_callback);
 
         EventBus.emit("musicPlayer_requestMusicInfo");
+
+        EventBus.emit("musicPlayer_setVolume", config.volume);
     }, []);
 
     function changeVolumn(e: number) {
@@ -78,18 +80,18 @@ export default function MusicPlayingSettings() {
         switch (mode) {
             case "single_loop":
                 return <ArrowPathIcon className="h-8 w-8 text-gray-300 group-hover:text-gray-200 cursor-pointer inline"
-                        onClick={() => changePlayingMode("single_loop")}></ArrowPathIcon>;
+                    onClick={() => changePlayingMode("single_loop")}></ArrowPathIcon>;
             case "shuffle":
                 return <ArrowsUpDownIcon className="h-8 w-8 text-gray-300 group-hover:text-gray-200 cursor-pointer inline"
-                        onClick={() => changePlayingMode("shuffle")}></ArrowsUpDownIcon>;
+                    onClick={() => changePlayingMode("shuffle")}></ArrowsUpDownIcon>;
             case "list_loop":
                 return <BarsArrowDownIcon className="h-8 w-8 text-gray-300 group-hover:text-gray-200 cursor-pointer inline"
-                        onClick={() => changePlayingMode("list_loop")}></BarsArrowDownIcon>;
+                    onClick={() => changePlayingMode("list_loop")}></BarsArrowDownIcon>;
             default:
                 return <></>;
         }
     }
-    
+
     return (
         <div className="bg-[#313131] rounded-lg mt-5 mb-40">
             <MusicListModifier enableInnerIdSelect={true} />
@@ -106,14 +108,14 @@ export default function MusicPlayingSettings() {
                 </div>
                 <div className="col-span-1"></div>
                 <div className="col-span-1">
-                {
-                    getButton(playingMode)
-                }
+                    {
+                        getButton(playingMode)
+                    }
                 </div>
                 <div className="col-span-1">
-                {
-                    getPlayingModeText()
-                }
+                    {
+                        getPlayingModeText()
+                    }
                 </div>
                 <div className="col-span-1"></div>
                 <div className="col-span-1 text-xl" onClick={() => setDelay(Math.max(delay - 1, 0))}>

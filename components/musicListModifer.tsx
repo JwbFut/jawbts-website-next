@@ -1,6 +1,6 @@
 import { ChevronRightIcon, PauseIcon, PlayIcon, TrashIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
 import EventBus from "./eventBus";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { musicDataAsyncer } from "./asyncUtils";
 import { fetchApiPost } from "./serverActions";
 import { useCookies } from "react-cookie";
@@ -562,6 +562,26 @@ export default function MusicListModifier(props: any) {
         setMusicDisplayList(displayListUpdated);
     }
 
+    // 分页
+    const [curPage, setCurPage] = useState(1);
+    const [musicsOnPage, setMusicsOnPage] = useState(new Array<any>(0));
+    const musicPerPage = 20;
+    useEffect(() => {
+        let start = (curPage - 1) * musicPerPage;
+        let end = start + musicPerPage;
+        setMusicsOnPage(Array.from(musicDisplayList).slice(start, end));
+    }, [musicDisplayList, curPage]);
+
+    function filpPage(num: number) {
+        let totalP1 = Math.ceil(musicDisplayList.length / musicPerPage) + 1;
+        num += curPage;
+        if (num == 0) num = -1;
+        num += totalP1;
+        num = num % totalP1;
+        if (num == 0) num = 1;
+        setCurPage(num);
+    }
+
     return (
         <div className="bg-[#313131] rounded-lg py-5 mt-7 mb-10">
             <form className="grid grid-rows-1 grid-cols-12 text-gray-300 text-center mb-4" onSubmit={(event) => onTagsEditChange(event, true)}>
@@ -618,7 +638,7 @@ export default function MusicListModifier(props: any) {
                 <div className="col-span-2">偏好</div>
                 <div className="col-span-1"></div>
             </div>
-            {musicDisplayList.map((music: any) => (
+            {musicsOnPage.map((music: any) => (
                 <div key={music.title} className={"grid grid-rows-1 grid-cols-12 text-gray-300 text-center gap-5 my-1 " +
                     getMusicBgColorHtml(music)}>
                     <div key={music.title + "A"} className="col-span-1">
@@ -660,6 +680,22 @@ export default function MusicListModifier(props: any) {
                     </div>
                 </div>
             ))}
-        </div>
+            <div className="grid grid-rows-1 grid-cols-12 text-gray-300 text-center select-none mt-5">
+                <div className="col-span-2"></div>
+                <div className="col-span-3">{curPage} / {Math.ceil(musicDisplayList.length / musicPerPage)}</div>
+                <div className="col-span-2">
+                    <div className="flex justify-between">
+                        <button onClick={() => filpPage(-1)}>
+                            上一页
+                        </button>
+                        <button onClick={() => filpPage(1)}>
+                            下一页
+                        </button>
+                    </div>
+                </div>
+                <div className="col-span-3">共 {musicDisplayList.length} 首歌曲</div>
+                <div className="col-span-2"></div>
+            </div>
+        </div >
     )
 }

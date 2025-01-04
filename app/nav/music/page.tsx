@@ -27,7 +27,7 @@ export default function Page() {
             if (value.excludeId == "mainPage") return;
             setCurPlayingInfo(value);
         });
-        
+
         EventBus.emit("musicPlayer_requestMusicInfo");
     }, []);
 
@@ -43,7 +43,7 @@ export default function Page() {
     const [playingSettingsExpanded, setPlayingSettingsExpanded] = useState(false);
 
     return (
-        <div className="box-border m-6 pb-15">
+        <div className="box-border m-6 pb-20">
             <div className="flex justify-center w-full">
                 <img
                     src={imgUrl}
@@ -76,7 +76,7 @@ export default function Page() {
             {playingSettingsExpanded && (
                 <MusicPlayingSettings />
             )}
-            
+
         </div>
     );
 }

@@ -15,6 +15,7 @@ export default function MusicPlayer() {
     const [cookie, setCookie] = useCookies(["username", "token"]);
     const [playing, setPlaying] = useState(false);
     const [progressSt, setprogressSt] = useState(0);
+    const [durationSt, setDurationSt] = useState(0);
     const [curPlayingId, setCurPlayingId] = useState("###");
     const [localMusicList, setLocalMusicList] = useState([]);
     const [curPlayingInfo, setCurPlayingInfo] = useState({
@@ -118,6 +119,7 @@ export default function MusicPlayer() {
     function updateProgress() {
         const canvas = canvasRef.current;
         if (!canvas || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
+        if (durationSt != audioRef.current.duration) setDurationSt(audioRef.current.duration);
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
@@ -375,13 +377,13 @@ export default function MusicPlayer() {
             <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2 h-8" onTouchStart={onMouseDown}>
                 <audio ref={audioRef} onPlay={onPlay} onTimeUpdate={onTimeUpdate} onEnded={onEnded} hidden preload="auto"></audio>
                 <div className="hidden lg:col-span-1 lg:inline">
-                    {Utils.secToString(audioRef.current?.currentTime)}
+                    {Utils.secToString(durationSt * progressSt)}
                 </div>
                 <div className="col-span-12 px-10 lg:px-0 lg:col-span-10" onMouseDown={onMouseDown}>
                     <canvas ref={canvasRef} width="2000" height="8" className="w-full pt-2 h-4"></canvas>
                 </div>
                 <div className="hidden lg:col-span-1 lg:inline">
-                    {Utils.secToString(audioRef.current?.duration - audioRef.current?.currentTime)}
+                    {Utils.secToString(durationSt * (1 - progressSt))}
                 </div>
             </div>
             <div className="w-full text-white pb-4">

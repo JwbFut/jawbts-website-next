@@ -88,7 +88,7 @@ export default function Home() {
             <div className="text-center absolute m-auto inset-x-0 inset-y-0 w-1/2 h-1/2">
                 <div className={banner_styles.div}>
                     <header className={banner_styles.border}>
-                        <h1 className="tracking-wider text-[#80f4fa] text-2xl md:text-6xl font-black my-2 text-nowrap inline-block">J a w b t s</h1>
+                        <h1 className="tracking-wider text-[#80f4fa] text-5xl md:text-6xl font-black my-2 text-nowrap inline-block">J a w b t s</h1>
                     </header>
                     <div className="transition text-[rgba(255,255,255,0)] hover:text-[rgba(255,255,255,1)]">
                         <p>{bannerText.data.a}</p>

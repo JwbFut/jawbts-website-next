@@ -60,4 +60,24 @@ export default class Utils {
     }
 
     static nonePNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAANSURBVBhXY2BgYGAAAAAFAAGKM+MAAAAAAElFTkSuQmCC"
+
+    static getEventX(event: any) {
+        if (event.clientX !== undefined) {
+            return event.clientX;
+        }
+        if (!event.touches || event.touches.length === 0) {
+            return null;
+        }
+        return event.touches[0].clientX;
+    }
+
+    static getEventY(event: any) {
+        if (event.clientY !== undefined) {
+            return event.clientY;
+        }
+        if (!event.touches || event.touches.length === 0) {
+            return null;
+        }
+        return event.touches[0].clientY;
+    }
 }

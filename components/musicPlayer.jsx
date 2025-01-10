@@ -57,11 +57,12 @@ export default function MusicPlayer() {
     let playing_temp;
     // 进度条逻辑
     function onMouseDown(e) {
+        if (!Utils.getEventX(e)) return;
         e.preventDefault();
         playing_temp = !audioRef.current.paused;
         audioRef.current.pause();
 
-        slideBeginX = e.clientX | e.changedTouches[0].clientX;
+        slideBeginX = Utils.getEventX(e);
         progressBegin = progressSt;
         progressBarLength = canvasRef.current["offsetWidth"];
         document.addEventListener('mousemove', onMouseMove);
@@ -72,7 +73,8 @@ export default function MusicPlayer() {
     }
 
     function onMouseMove(e) {
-        progress = (progressBegin * progressBarLength + (e.clientX | e.changedTouches[0].clientX) - slideBeginX) / progressBarLength;
+        if (!Utils.getEventX(e)) return;
+        progress = (progressBegin * progressBarLength + (Utils.getEventX(e)) - slideBeginX) / progressBarLength;
         progress = progress < 0 ? 0 : progress;
         progress = progress > 1 ? 1 : progress;
         setprogressSt(progress);

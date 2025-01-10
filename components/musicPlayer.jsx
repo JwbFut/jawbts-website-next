@@ -1,11 +1,10 @@
 "use client"
 
-import music_player from "@/components/music_player.module.css"
 import {
     PlayIcon,
     PauseIcon
 } from '@heroicons/react/24/outline';
-import { use, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getApiUrl, getDomesticApiUrl } from "./serverActions";
 import { useCookies } from "react-cookie";
 import Utils from "./utils";
@@ -15,8 +14,7 @@ import { musicDataAsyncer } from "./asyncUtils";
 export default function MusicPlayer() {
     const [cookie, setCookie] = useCookies(["username", "token"]);
     const [playing, setPlaying] = useState(false);
-    const [barWidth, setBarWidth] = useState(0);
-    const [progressSt, setProgressSt] = useState(0);
+    const [progressSt, setprogressSt] = useState(0);
     const [curPlayingId, setCurPlayingId] = useState("###");
     const [localMusicList, setLocalMusicList] = useState([]);
     const [curPlayingInfo, setCurPlayingInfo] = useState({
@@ -30,9 +28,8 @@ export default function MusicPlayer() {
         paused: true,
     });
     const [infoChangeCuzReload, setInfoChangeCuzReload] = useState(false);
-    const progressBarRef = useRef(null);
     const audioRef = useRef(null);
-
+    const canvasRef = useRef(null);
     const [delay, setDelay] = useState(0);
 
     let callFlag_musicDataAsyncer = false;
@@ -56,6 +53,7 @@ export default function MusicPlayer() {
 
     let progress = 0, progressBarLength = 1, slideBeginX = 0, progressBegin = 0;
 
+    const [duringMouseMove, setDuringMouseMove] = useState(false);
     let playing_temp;
     // 进度条逻辑
     function onMouseDown(e) {
@@ -63,29 +61,88 @@ export default function MusicPlayer() {
         playing_temp = !audioRef.current.paused;
         audioRef.current.pause();
 
-        slideBeginX = e.clientX;
+        slideBeginX = e.clientX | e.changedTouches[0].clientX;
         progressBegin = progressSt;
-        if (progressBarRef.current) progressBarLength = progressBarRef.current["offsetWidth"];
+        progressBarLength = canvasRef.current["offsetWidth"];
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
+        document.addEventListener('touchmove', onMouseMove);
+        document.addEventListener('touchend', onMouseUp);
+        setDuringMouseMove(true);
     }
 
     function onMouseMove(e) {
-        progress = (progressBegin * progressBarLength + e.clientX - slideBeginX) / progressBarLength;
+        progress = (progressBegin * progressBarLength + (e.clientX | e.changedTouches[0].clientX) - slideBeginX) / progressBarLength;
         progress = progress < 0 ? 0 : progress;
         progress = progress > 1 ? 1 : progress;
-        setBarWidth(progress);
+        setprogressSt(progress);
+        onProgressJump(false);
     }
 
     function onMouseUp() {
-        setProgressSt(progress);
+        setprogressSt(progress);
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('touchmove', onMouseMove);
+        document.removeEventListener('touchend', onMouseUp);
+        setDuringMouseMove(false);
 
         if (playing_temp) audioRef.current.play();
         if (!Number.isFinite(audioRef.current.duration)) return;
         audioRef.current.currentTime = audioRef.current.duration * progress;
+        onProgressJump();
     }
+
+    function onProgressJump(delay = true) {
+        if (delay) {
+            window.setTimeout(() => _onProgressJump(), 100);
+        } else {
+            window.setTimeout(() => _onProgressJump(), 1);
+        }
+    }
+
+    function _onProgressJump() {
+        const canvas = canvasRef.current;
+        if (!canvas || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function onPlay() {
+        onProgressJump();
+    }
+
+    const rafId = useRef(null);
+    function updateProgress() {
+        const canvas = canvasRef.current;
+        if (!canvas || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const duration = audioRef.current.duration;
+        for (let i = 0; i < audioRef.current.buffered.length; i++) {
+            const start = audioRef.current.buffered.start(i) / duration;
+            const end = audioRef.current.buffered.end(i) / duration;
+            ctx.fillStyle = '#555';
+            ctx.fillRect(start * width, 0, (end - start) * width, height);
+        }
+
+        // Draw progress bar
+        ctx.fillStyle = '#f0f0f0';
+        if (duringMouseMove) {
+            ctx.fillRect(0, 0, progressSt * width, height);
+        } else {
+            ctx.fillRect(0, 0, audioRef.current.currentTime / duration * width, height);
+        }
+        rafId.current = window.requestAnimationFrame(updateProgress);
+    }
+    useEffect(() => {
+        rafId.current = requestAnimationFrame(updateProgress);
+        return () => {
+            if (rafId.current) cancelAnimationFrame(rafId.current);
+        }
+    }, [progressSt]);
 
     // 播放信息同步逻辑
     EventBus.removeAllListeners("musicPlayer_requestMusicInfo");
@@ -177,11 +234,12 @@ export default function MusicPlayer() {
         setPlaying(!audioRef.current.paused);
         if (!Number.isFinite(audioRef.current.duration)) return;
         progress = audioRef.current.currentTime / audioRef.current.duration;
-        setProgressSt(progress);
-        setBarWidth(progress);
+        setprogressSt(progress);
+        // updateProgress();
     }
 
     async function onDurationChange() {
+        window.setTimeout(() => onProgressJump(), 1000);
         try {
             await Promise.race([audioRef.current.play(), new Promise((_, reject) => setTimeout(reject("f"), 1000))]);
         } catch (e) {
@@ -312,17 +370,13 @@ export default function MusicPlayer() {
 
     return (
         <header className="bg-[#16161a] w-full bottom-0 fixed select-none">
-            <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2">
-                <audio ref={audioRef} onTimeUpdate={onTimeUpdate} onEnded={onEnded} hidden preload="auto"></audio>
+            <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2 h-8" onTouchStart={onMouseDown}>
+                <audio ref={audioRef} onPlay={onPlay} onTimeUpdate={onTimeUpdate} onEnded={onEnded} hidden preload="auto"></audio>
                 <div className="hidden lg:col-span-1 lg:inline">
                     {Utils.secToString(audioRef.current?.currentTime)}
                 </div>
                 <div className="col-span-12 px-10 lg:px-0 lg:col-span-10" onMouseDown={onMouseDown}>
-                    <div className={music_player.progress_div} ref={progressBarRef}>
-                        <div className={music_player.progress_bar} style={{ width: barWidth * 100 + '%' }}>
-                            <div className={music_player.progress_thumb}></div>
-                        </div>
-                    </div>
+                    <canvas ref={canvasRef} width="2000" height="8" className="w-full pt-2 h-4"></canvas>
                 </div>
                 <div className="hidden lg:col-span-1 lg:inline">
                     {Utils.secToString(audioRef.current?.duration - audioRef.current?.currentTime)}

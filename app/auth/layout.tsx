@@ -1,4 +1,4 @@
-import MusicPlayer from "@/components/musicPlayer";
+import MusicPlayer from "@/components/ui/musicPlayer";
 import { Suspense } from "react";
 
 export default function RootLayout({

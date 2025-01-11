@@ -5,7 +5,7 @@ import Utils from "@/components/utils/utils";
 import Image from "next/image";
 import { MouseEvent, use, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { generateQRCode } from "@/components/serverActionsJS";
+import { generateQRCode } from "@/components/logic/serverActionsJS";
 
 export default function Page() {
     const [cookie, setCookie] = useCookies(["username", "token", "client_id"]);

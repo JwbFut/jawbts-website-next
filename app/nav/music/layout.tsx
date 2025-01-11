@@ -1,4 +1,4 @@
-import MusicPlayer from "@/components/musicPlayer";
+import MusicPlayer from "@/components/ui/musicPlayer";
 
 export default function RootLayout({
     children,

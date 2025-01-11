@@ -146,7 +146,7 @@ export default function MusicPlayer() {
         return () => {
             if (rafId.current) cancelAnimationFrame(rafId.current);
         }
-    }, [progressSt]);
+    }, []);
 
     // 播放信息同步逻辑
     EventBus.removeAllListeners("musicPlayer_requestMusicInfo");

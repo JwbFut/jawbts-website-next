@@ -5,11 +5,11 @@ import {
     PauseIcon
 } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from 'react';
-import { getApiUrl, getDomesticApiUrl } from "./serverActions";
+import { getApiUrl, getDomesticApiUrl } from "@/components/logic/serverActions";
 import { useCookies } from "react-cookie";
-import Utils from "./utils";
-import EventBus from "./eventBus";
-import { musicDataAsyncer } from "./asyncUtils";
+import Utils from "@/components/utils/utils";
+import EventBus from "@/components/logic/eventBus";
+import { musicDataAsyncer } from "@/components/utils/asyncUtils";
 
 export default function MusicPlayer() {
     const [cookie, setCookie] = useCookies(["username", "token"]);

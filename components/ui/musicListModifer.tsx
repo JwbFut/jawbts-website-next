@@ -1,7 +1,7 @@
 import { ChevronRightIcon, PauseIcon, PlayIcon, TrashIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
 import EventBus from "../logic/eventBus";
 import { use, useEffect, useState } from "react";
-import { musicDataAsyncer } from "../utils/asyncUtils";
+import { musicDataAsyncer } from "@/components/utils/asyncUtils";
 import { fetchApiPost } from "../logic/serverActions";
 import { useCookies } from "react-cookie";
 

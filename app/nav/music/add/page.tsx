@@ -1,10 +1,10 @@
 "use client"
 
-import { musicDataAsyncer } from '@/components/asyncUtils';
-import BiliBiliUtils from '@/components/bilibiliUtils';
-import EventBus from '@/components/eventBus';
-import MusicListModifier from '@/components/musicListModifer';
-import { addMusic } from '@/components/serverActions';
+import { musicDataAsyncer } from '@/components/utils/asyncUtils';
+import BiliBiliUtils from '@/components/utils/bilibiliUtils';
+import EventBus from '@/components/logic/eventBus';
+import MusicListModifier from '@/components/ui/musicListModifer';
+import { addMusic } from '@/components/logic/serverActions';
 import {
     ArrowLeftIcon,
     CheckIcon,
@@ -111,7 +111,7 @@ export default function Page() {
             }
             return true;
         });
-        
+
         EventBus.emit("musicListModifier_appendMusic", list_append);
     }
 
@@ -128,7 +128,7 @@ export default function Page() {
                 setError(res["data"]["reason"]);
             } else {
                 musicDataAsyncer.set(musicDataAsyncer.get().concat(musicList_updated), res["data"]["async_time"]);
-    
+
                 setMusicList(new Array<any>(0));
                 EventBus.emit("musicListModifier_updateMusicList", []);
             }

@@ -1,8 +1,8 @@
 "use client"
 
-import { musicDataAsyncer } from '@/components/asyncUtils';
-import EventBus from '@/components/eventBus';
-import MusicListModifier from '@/components/musicListModifer';
+import { musicDataAsyncer } from '@/components/utils/asyncUtils';
+import EventBus from '@/components/logic/eventBus';
+import MusicListModifier from '@/components/ui/musicListModifer';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useEffect } from 'react';

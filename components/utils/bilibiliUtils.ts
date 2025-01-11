@@ -1,4 +1,4 @@
-import { fetchJson } from "./serverActions";
+import { fetchJson } from "../logic/serverActions";
 
 export default class BiliBiliUtils {
     static async getPagesA(aid: string) {

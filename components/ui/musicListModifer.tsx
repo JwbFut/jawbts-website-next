@@ -1,8 +1,8 @@
 import { ChevronRightIcon, PauseIcon, PlayIcon, TrashIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
-import EventBus from "./eventBus";
+import EventBus from "../logic/eventBus";
 import { use, useEffect, useState } from "react";
-import { musicDataAsyncer } from "./asyncUtils";
-import { fetchApiPost } from "./serverActions";
+import { musicDataAsyncer } from "../utils/asyncUtils";
+import { fetchApiPost } from "../logic/serverActions";
 import { useCookies } from "react-cookie";
 
 const f_mi_callback = (data: any) => {

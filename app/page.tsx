@@ -2,7 +2,7 @@
 
 import banner_styles from "@/app/banner_styles.module.css";
 import { FormEvent, useEffect, useState } from "react";
-import { getBannerText, submitLoginForm } from "@/components/serverActions";
+import { getBannerText, submitLoginForm } from "@/components/logic/serverActions";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 import Link from "next/link";

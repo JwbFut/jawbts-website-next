@@ -1,7 +1,7 @@
 "use client"
 
-import { getProfile, submitProfileEditForm } from "@/components/serverActions";
-import Utils from "@/components/utils";
+import { getProfile, submitProfileEditForm } from "@/components/logic/serverActions";
+import Utils from "@/components/utils/utils";
 import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";

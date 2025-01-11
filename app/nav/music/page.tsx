@@ -1,9 +1,9 @@
 "use client"
 
-import EventBus from "@/components/eventBus";
-import MusicPlayingSettings from "@/components/musicPlayingSettings";
-import { getDomesticApiUrl } from "@/components/serverActions";
-import Utils from "@/components/utils";
+import EventBus from "@/components/logic/eventBus";
+import MusicPlayingSettings from "@/components/ui/musicPlayingSettings";
+import { getDomesticApiUrl } from "@/components/logic/serverActions";
+import Utils from "@/components/utils/utils";
 import { PencilSquareIcon, PlusIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useEffect, useState } from "react";

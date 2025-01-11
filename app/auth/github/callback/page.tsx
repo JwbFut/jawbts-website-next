@@ -1,6 +1,6 @@
 "use client"
 
-import { verifyGithubLoginRedirect } from "@/components/serverActions";
+import { verifyGithubLoginRedirect } from "@/components/logic/serverActions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";

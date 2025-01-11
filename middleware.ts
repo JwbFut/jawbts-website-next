@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import AuthUtils from "@/components/authUtils";
+import AuthUtils from "@/components/utils/authUtils";
 
 export async function middleware(request: NextRequest) {
     const res = await AuthUtils.checkAuth();

@@ -1,7 +1,7 @@
 "use client"
 
-import { fetchApiGet, getProfile, removeRefreshToken } from "@/components/serverActions";
-import Utils from "@/components/utils";
+import { fetchApiGet, getProfile, removeRefreshToken } from "@/components/logic/serverActions";
+import Utils from "@/components/utils/utils";
 import Image from "next/image";
 import { MouseEvent, use, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";

@@ -1,7 +1,7 @@
 "use client"
 
-import { Redirecter } from "@/components/redirecter";
-import { refreshJwt } from "@/components/serverActions";
+import { Redirecter } from "@/components/ui/redirecter";
+import { refreshJwt } from "@/components/logic/serverActions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";

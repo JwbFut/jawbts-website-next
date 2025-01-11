@@ -1,6 +1,6 @@
 "use client"
 
-import { verifyOTPLoginRedirect } from "@/components/serverActions";
+import { verifyOTPLoginRedirect } from "@/components/logic/serverActions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";

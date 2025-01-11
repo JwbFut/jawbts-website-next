@@ -1,13 +1,13 @@
 "use client"
 
-import { fetchApiGet } from "./serverActions";
+import { fetchApiGet } from "../logic/serverActions";
 
 class Asyncer {
     public name: string;
     public asyncUrl: string;
     public onChange: (data: any) => void;
 
-    constructor(name: string, asyncUrl: string, onChange: (data: any) => void = () => {}) {
+    constructor(name: string, asyncUrl: string, onChange: (data: any) => void = () => { }) {
         this.name = name;
         this.asyncUrl = asyncUrl;
         this.onChange = onChange;

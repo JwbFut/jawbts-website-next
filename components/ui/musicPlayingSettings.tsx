@@ -1,7 +1,7 @@
 import MusicListModifier from "./musicListModifer";
-import EventBus from "./eventBus";
+import EventBus from "../logic/eventBus";
 import { use, useEffect, useState } from "react";
-import { musicDataAsyncer } from "./asyncUtils";
+import { musicDataAsyncer } from "../utils/asyncUtils";
 import { ArrowPathIcon, ArrowsUpDownIcon, BarsArrowDownIcon } from "@heroicons/react/24/outline";
 
 const f_callback = (info: any) => {

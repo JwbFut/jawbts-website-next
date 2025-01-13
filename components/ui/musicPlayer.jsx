@@ -66,10 +66,10 @@ export default function MusicPlayer() {
         slideBeginX = Utils.getEventX(e);
         progressBegin = progressSt;
         progressBarLength = canvasRef.current["offsetWidth"];
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-        document.addEventListener('touchmove', onMouseMove);
-        document.addEventListener('touchend', onMouseUp);
+        document.addEventListener('mousemove', onMouseMove, { passive: true });
+        document.addEventListener('mouseup', onMouseUp, { passive: true });
+        document.addEventListener('touchmove', onMouseMove, { passive: true });
+        document.addEventListener('touchend', onMouseUp, { passive: true });
         setDuringMouseMove(true);
     }
 

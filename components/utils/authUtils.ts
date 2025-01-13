@@ -11,7 +11,7 @@ export default class AuthUtils {
      * 0 -> 无效; 1 -> 有效; 2 -> 过期
      */
     static async checkAuth(first_try: boolean = true): Promise<number> {
-        const cookieStorage = cookies();
+        const cookieStorage = await cookies();
         let token = cookieStorage.get("token")?.value;
         let username = cookieStorage.get("username")?.value;
         if (!token || !username) return 0;
@@ -24,7 +24,7 @@ export default class AuthUtils {
             if (!payload.scope) return 0;
             if (!(payload.scope instanceof Array)) return 0;
             return payload.scope.includes("website") ? 1 : 0;
-        } catch(err) {
+        } catch (err) {
             if ((err as Error).message === '"exp" claim timestamp check failed') {
                 return 2;
             }

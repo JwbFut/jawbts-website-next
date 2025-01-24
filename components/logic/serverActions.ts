@@ -59,7 +59,7 @@ export async function submitProfileEditForm(token: string, avatar_url: string | 
     try {
         const res = await fetch(`${process.env.API_URL}/profiles/set`, {
             method: "POST",
-            body: JSON.stringify({avatar_url: avatar_url, description: description}),
+            body: JSON.stringify({ avatar_url: avatar_url, description: description }),
             headers: { "Authorization": "Bearer " + token }
         });
         return await res.json();
@@ -80,7 +80,7 @@ export async function removeRefreshToken(token: string, desc_c: string) {
 export async function fetchJson(url: string, userAgent: string | null = "") {
     let actual_ua = userAgent ? userAgent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0";
     try {
-        const res = await fetch(url, { headers: { "User-Agent": actual_ua} });
+        const res = await fetch(url, { headers: { "User-Agent": actual_ua } });
         return await res.json();
     } catch (e) {
         return (e as Error).message;
@@ -142,6 +142,6 @@ export async function checkToken(token: string) {
 }
 
 export async function getDomesticApiUrl(token: string) {
-    if (!await checkToken(token)) return "";
+    if (!await checkToken(token)) return null;
     return process.env.DOMESTIC_API_URL;
 }

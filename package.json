@@ -9,8 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ffmpeg/ffmpeg": "^0.12.15",
-    "@ffmpeg/util": "^0.12.2",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "jose": "^5.9.6",

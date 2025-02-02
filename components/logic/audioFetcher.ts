@@ -249,7 +249,7 @@ export default class AudioFetcher {
                         ready: false,
                         fetching: false,
                         appended: false,
-                        relatedReferenceIndex: relatedReferenceIndex.slice(),
+                        relatedReferenceIndex: relatedReferenceIndex.slice(0),
                         neverDrop: kFrag <= 1, // first and second are not aligned with the reference, dont drop them
                         mustFetch: kFrag <= 1 // first and second are not aligned with the reference, fetch them first
                     });
@@ -259,7 +259,7 @@ export default class AudioFetcher {
             }
 
             if (!this.sourceBuffer) throw new Error("sourceBuffer not created"); // should never happen
-            await this.appendBufferAsync(fetchedBuffer.slice());
+            await this.appendBufferAsync(fetchedBuffer.slice(0));
 
             this.fragments[0].ready = true;
             this.fragments[0].appended = true;

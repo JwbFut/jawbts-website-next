@@ -80,4 +80,9 @@ export default class Utils {
         }
         return event.touches[0].clientY;
     }
+
+    static async toBlobUrlForceCached(url: string, mimeType: string): Promise<string> {
+        const buf = await (await fetch(url, { cache: "force-cache" })).arrayBuffer();
+        return URL.createObjectURL(new Blob([buf], { type: mimeType }));
+    }
 }

@@ -5,11 +5,14 @@ import {
     PauseIcon
 } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from 'react';
-import { getApiUrl, getDomesticApiUrl } from "@/components/logic/serverActions";
+import { getDomesticApiUrl } from "@/components/logic/serverActions";
 import { useCookies } from "react-cookie";
 import Utils from "@/components/utils/utils";
 import EventBus from "@/components/logic/eventBus";
 import { musicDataAsyncer } from "@/components/utils/asyncUtils";
+import AudioModified from '../logic/audioModified';
+
+const DEV_MODE = false;
 
 export default function MusicPlayer() {
     const [cookie, setCookie] = useCookies(["username", "token"]);
@@ -30,14 +33,40 @@ export default function MusicPlayer() {
     });
     const [infoChangeCuzReload, setInfoChangeCuzReload] = useState(false);
     const audioRef = useRef(null);
+
+    useEffect(() => {
+        if (audioRef.current) return;
+        audioRef.current = new AudioModified();
+
+        audioRef.current.setOnTimeUpdate(onTimeUpdate);
+        audioRef.current.setOnPlay(onPlay);
+    }, []);
+
     const canvasRef = useRef(null);
     const [delay, setDelay] = useState(0);
+
+    // tick
+    useEffect(() => {
+        const intervalId = window.setInterval(() => {
+            if (audioRef.current) {
+                audioRef.current.tick();
+                // console.log(audioRef.current);
+            }
+        }, 200);
+
+        return () => {
+            // console.log("clear interval");
+            window.clearInterval(intervalId);
+        };
+    }, []);
 
     let callFlag_musicDataAsyncer = false;
     // 同步先
     useEffect(() => {
-        const f = () => {
-            musicDataAsyncer.checkAndAsync(cookie.token);
+        const f = async () => {
+            setLocalMusicList(musicDataAsyncer.get());
+            await musicDataAsyncer.checkAndAsync(cookie.token);
+            setLocalMusicList(musicDataAsyncer.get());
         }
         if (!callFlag_musicDataAsyncer) {
             f();
@@ -45,22 +74,15 @@ export default function MusicPlayer() {
         }
     }, []);
 
-    useEffect(() => {
-        setLocalMusicList(musicDataAsyncer.get());
-        if (window) window.setInterval(() => {
-            setLocalMusicList(musicDataAsyncer.get());
-        }, 10000);
-    }, []);
-
     let progress = 0, progressBarLength = 1, slideBeginX = 0, progressBegin = 0;
+    const progressRef = useRef(0); // only works during mousemove
 
-    const [duringMouseMove, setDuringMouseMove] = useState(false);
     let playing_temp;
     // 进度条逻辑
     function onMouseDown(e) {
         if (!Utils.getEventX(e)) return;
         e.preventDefault();
-        playing_temp = !audioRef.current.paused;
+        playing_temp = !audioRef.current.isPaused();
         audioRef.current.pause();
 
         slideBeginX = Utils.getEventX(e);
@@ -70,7 +92,7 @@ export default function MusicPlayer() {
         document.addEventListener('mouseup', onMouseUp, { passive: true });
         document.addEventListener('touchmove', onMouseMove, { passive: true });
         document.addEventListener('touchend', onMouseUp, { passive: true });
-        setDuringMouseMove(true);
+        duringMouseMoveRef.current = true;
     }
 
     function onMouseMove(e) {
@@ -80,7 +102,10 @@ export default function MusicPlayer() {
         progress = progress > 1 ? 1 : progress;
         setprogressSt(progress);
         onProgressJump(false);
+        progressRef.current = progress;
     }
+
+    const duringMouseMoveRef = useRef(false);
 
     function onMouseUp() {
         setprogressSt(progress);
@@ -88,11 +113,11 @@ export default function MusicPlayer() {
         document.removeEventListener('mouseup', onMouseUp);
         document.removeEventListener('touchmove', onMouseMove);
         document.removeEventListener('touchend', onMouseUp);
-        setDuringMouseMove(false);
+        duringMouseMoveRef.current = false;
 
         if (playing_temp) audioRef.current.play();
-        if (!Number.isFinite(audioRef.current.duration)) return;
-        audioRef.current.currentTime = audioRef.current.duration * progress;
+        if (!Number.isFinite(audioRef.current.getDuration())) return;
+        audioRef.current.setCurTime(audioRef.current.getDuration() * progress);
         onProgressJump();
     }
 
@@ -106,7 +131,7 @@ export default function MusicPlayer() {
 
     function _onProgressJump() {
         const canvas = canvasRef.current;
-        if (!canvas || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
+        if (!canvas || !audioRef.current || audioRef.current.getDuration() == null) return;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -118,30 +143,42 @@ export default function MusicPlayer() {
     const rafId = useRef(null);
     function updateProgress() {
         const canvas = canvasRef.current;
-        if (!canvas || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
-        if (durationSt != audioRef.current.duration) setDurationSt(audioRef.current.duration);
+        if (!canvas || !audioRef.current || !Number.isFinite(audioRef.current.getDuration())) {
+            rafId.current = window.requestAnimationFrame(updateProgress);
+            return;
+        }
+        if (durationSt != audioRef.current.getDuration()) setDurationSt(audioRef.current.getDuration());
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
         const height = canvas.height;
 
-        const duration = audioRef.current.duration;
-        for (let i = 0; i < audioRef.current.buffered.length; i++) {
-            const start = audioRef.current.buffered.start(i) / duration;
-            const end = audioRef.current.buffered.end(i) / duration;
+        if (DEV_MODE) ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const duration = audioRef.current.getDuration();
+        for (let i = 0; i < audioRef.current.getBuffered().length; i++) {
+            const start = audioRef.current.getBuffered().start(i) / duration;
+            const end = audioRef.current.getBuffered().end(i) / duration;
             ctx.fillStyle = '#555';
             ctx.fillRect(start * width, 0, (end - start) * width, height);
         }
 
         // Draw progress bar
-        ctx.fillStyle = '#f0f0f0';
-        if (duringMouseMove) {
-            ctx.fillRect(0, 0, progressSt * width, height);
+        if (!DEV_MODE) {
+            ctx.fillStyle = '#f0f0f0';
+            if (duringMouseMoveRef.current) {
+                ctx.fillRect(0, 0, progressRef.current * width, height);
+            } else {
+                ctx.fillRect(0, 0, audioRef.current.getCurTime() / duration * width, height);
+            }
         } else {
-            ctx.fillRect(0, 0, audioRef.current.currentTime / duration * width, height);
+            ctx.fillStyle = '#f0f0f0'
+            ctx.fillRect(audioRef.current.getCurTime() / duration * width, 0, 0.002 * width, height);
         }
+
         rafId.current = window.requestAnimationFrame(updateProgress);
     }
     useEffect(() => {
+        if (rafId.current) cancelAnimationFrame(rafId.current);
         rafId.current = requestAnimationFrame(updateProgress);
         return () => {
             if (rafId.current) cancelAnimationFrame(rafId.current);
@@ -163,6 +200,12 @@ export default function MusicPlayer() {
     }, [playing]);
 
     // 播放逻辑
+    useEffect(() => {
+        if (audioRef.current && audioRef.current.ended) {
+            onEnded();
+        }
+    }, [audioRef.current?.ended]);
+
     const [firstCall, setFirstCall] = useState(true);
     useEffect(() => {
         if (curPlayingId === "###") {
@@ -178,29 +221,28 @@ export default function MusicPlayer() {
 
         const f = async function () {
             audioRef.current.pause();
-            audioRef.current.src = await getDomesticApiUrl(cookie.token) + "/music/get?id=" + curPlayingId + "&token=" + cookie.token + "&timestamp=" + Date.now();
+            audioRef.current.setSrc(await getDomesticApiUrl(cookie.token) + "/music/get?id=" + curPlayingId + "&token=" + cookie.token + "&timestamp=" + Date.now());
             if (firstCall) {
                 if (localStorage) {
                     let musicInfo = localStorage.getItem("musicPlayerInfo");
                     if (musicInfo) {
                         let musicInfoParsed = JSON.parse(musicInfo);
-                        audioRef.current.currentTime = musicInfoParsed.currentTime ? musicInfoParsed.currentTime : 0;
+                        audioRef.current.setCurTime(musicInfoParsed.currentTime ? musicInfoParsed.currentTime : 0);
                     }
+
+                    window.setInterval(saveInfoToLocalStorage, 1000);
                 }
 
                 setFirstCall(false);
             } else {
-                audioRef.current.currentTime = 0;
-                // audioRef.current.pause();
-                // setPlaying(false);
-                // console.log(delay);
+                audioRef.current.setCurTime(0);
                 if (delay <= 0) {
                     audioRef.current.play();
                     onDurationChange();
                 } else {
                     setTimeout(() => {
                         // console.log("now play");
-                        if (!audioRef.current || audioRef.current.currentTime != 0) return;
+                        if (!audioRef.current || audioRef.current.getCurTime() != 0) return;
                         // console.log("play again");
                         audioRef.current.play();
                         onDurationChange();
@@ -226,7 +268,7 @@ export default function MusicPlayer() {
         setPlaying(setPlayingStats);
         if (setPlayingStats) {
             audioRef.current.play();
-            if (audioRef.current.currentTime === 0) {
+            if (audioRef.current.getCurTime() === 0) {
                 onDurationChange();
             }
         } else {
@@ -235,40 +277,16 @@ export default function MusicPlayer() {
     }
 
     function onTimeUpdate() {
-        setPlaying(!audioRef.current.paused);
-        if (!Number.isFinite(audioRef.current.duration)) return;
-        progress = audioRef.current.currentTime / audioRef.current.duration;
+        setPlaying(!audioRef.current.isPaused());
+        if (!Number.isFinite(audioRef.current.getDuration())) return;
+        progress = audioRef.current.getCurTime() / audioRef.current.getDuration();
         setprogressSt(progress);
         // updateProgress();
     }
 
     async function onDurationChange() {
         window.setTimeout(() => onProgressJump(), 1000);
-        try {
-            await Promise.race([audioRef.current.play(), new Promise((_, reject) => setTimeout(reject("f"), 1000))]);
-        } catch (e) {
-            if (e.name === "NotAllowedError") {
-                return;
-            }
-        }
-
-        audioRef.current.currentTime = 0;
-        // console.log(Date.now(), "start", audioRef.current.currentTime);
-        new Promise(resolve => setTimeout(resolve, 3000)).then(async () => {
-            if (!audioRef.current) return;
-            // console.log(Date.now(), "end");
-            // console.log(audioRef.current.currentTime, audioRef.current.readyState);
-            if (0 < audioRef.current.currentTime && audioRef.current.readyState >= 2) return;
-            try {
-                await audioRef.current.load();
-            } catch (e) {
-                console.log(e);
-                return;
-            }
-            audioRef.current.play();
-            // console.log("load again");
-            onDurationChange();
-        });
+        audioRef.current.play()
     }
 
     // 监听换曲目
@@ -291,7 +309,7 @@ export default function MusicPlayer() {
     EventBus.removeAllListeners("musicPlayer_setVolume");
     EventBus.on("musicPlayer_setVolume", (volume) => {
         if (!audioRef.current) return;
-        audioRef.current.volume = volume / 100;
+        audioRef.current.setVolume(volume / 100);
     });
 
     // playinfo sync with title & to localstorage & to eventbus
@@ -312,13 +330,16 @@ export default function MusicPlayer() {
         if (curPlayingInfo.code !== "Success") return;
         if (!localStorage) return;
         if (!curPlayingInfo || curPlayingInfo.code !== "Success") {
-            localStorage.removeItem("musicPlayerInfo");
             return;
         }
-        localStorage.setItem("musicPlayerInfo", JSON.stringify({
-            info: curPlayingInfo.data,
-            currentTime: 0,
-        }));
+        let k = localStorage.getItem("musicPlayerInfo");
+        if (k) k = JSON.parse(k);
+        if (!k || k.info?.inner_id !== curPlayingInfo.data.inner_id) {
+            localStorage.setItem("musicPlayerInfo", JSON.stringify({
+                info: curPlayingInfo.data,
+                currentTime: 0,
+            }));
+        }
     }, [curPlayingInfo]);
 
     // 把播放信息存到localstorage
@@ -327,17 +348,15 @@ export default function MusicPlayer() {
         let k = localStorage.getItem("musicPlayerInfo");
         if (!k) return;
         let k_parsed = JSON.parse(k);
-        k_parsed.currentTime = audioRef.current.currentTime;
+        k_parsed.currentTime = audioRef.current.getCurTime();
         localStorage.setItem("musicPlayerInfo", JSON.stringify(k_parsed));
     }
 
-    useEffect(() => {
-        if (!window) return;
-        window.setInterval(saveInfoToLocalStorage, 1000);
-    }, []);
-
     // 播放结束后操作
     function onEnded() {
+        if (DEV_MODE) console.log("ended");
+        onProgressJump(false);
+        onProgressJump();
         let playingMode = localStorage.getItem("musicPlayerConfig");
         if (!playingMode) {
             audioRef.current.pause();
@@ -347,9 +366,9 @@ export default function MusicPlayer() {
         let playingMode_parsed = JSON.parse(playingMode);
         switch (playingMode_parsed.playingMode) {
             case "single_loop":
-                audioRef.current.currentTime = 0;
+                audioRef.current.setCurTime(0);
                 setTimeout(() => {
-                    if (!audioRef.current || audioRef.current.currentTime != 0) return;
+                    if (!audioRef.current || audioRef.current.getCurTime() != 0) return;
                     audioRef.current.play();
                 }, 1000 * playingMode_parsed.delay);
                 break;
@@ -375,7 +394,6 @@ export default function MusicPlayer() {
     return (
         <header className="bg-[#16161a] w-full bottom-0 fixed select-none">
             <div className="grid grid-rows-1 grid-cols-12 text-white text-center pt-2 h-8" onTouchStart={onMouseDown}>
-                <audio ref={audioRef} onPlay={onPlay} onTimeUpdate={onTimeUpdate} onEnded={onEnded} hidden preload="auto"></audio>
                 <div className="hidden lg:col-span-1 lg:inline">
                     {Utils.secToString(durationSt * progressSt)}
                 </div>

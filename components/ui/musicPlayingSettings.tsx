@@ -8,7 +8,11 @@ const f_callback = (info: any) => {
     EventBus.emit("musicListModifier_setSelectedMusic", info.data);
 }
 
-export default function MusicPlayingSettings() {
+interface MusicPlayingSettingsProps {
+    visible: boolean;
+}
+
+export default function MusicPlayingSettings({ visible }: MusicPlayingSettingsProps) {
     const [volume, setVolume] = useState(100);
     const [lastChangeTime, setLastChangeTime] = useState(0);
     const [playingMode, setPlayingMode] = useState("single_loop");
@@ -19,6 +23,7 @@ export default function MusicPlayingSettings() {
     if (typeof window !== "undefined" && window.localStorage) config = JSON.parse(localStorage.getItem("musicPlayerConfig") || JSON.stringify({ volume: 100, playingMode: "single_loop", delay: 0 }));
 
     useEffect(() => {
+        if (typeof window !== "undefined" && window.localStorage) config = JSON.parse(localStorage.getItem("musicPlayerConfig") || JSON.stringify({ volume: 100, playingMode: "single_loop", delay: 0 }));
         setVolume(config.volume);
         setDelay(config.delay);
         setPlayingMode(config.playingMode);
@@ -93,7 +98,7 @@ export default function MusicPlayingSettings() {
     }
 
     return (
-        <div className="bg-[#313131] rounded-lg mt-5 mb-40">
+        <div className="bg-[#313131] rounded-lg mt-5 mb-40" hidden={!visible}>
             <MusicListModifier enableInnerIdSelect={true} />
             <div className="grid grid-rows-1 grid-cols-12 text-gray-300 text-center select-none pb-10">
                 <div className="col-span-1"></div>

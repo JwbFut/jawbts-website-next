@@ -17,6 +17,11 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+# 感谢
+[mp4box.js](https://github.com/gpac/mp4box.js) 提供MP4文件解析.  
+[ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) 提供各类格式支持.  
+[node-qrcode](https://github.com/soldair/node-qrcode) 生成二维码.  
+
 ## Getting Started
 
 First, run the development server:

@@ -73,10 +73,7 @@ export default function Page() {
                     ></Cog6ToothIcon>
                 </div>
             </div>
-            {playingSettingsExpanded && (
-                <MusicPlayingSettings />
-            )}
-
+            <MusicPlayingSettings visible={playingSettingsExpanded} />
         </div>
     );
 }

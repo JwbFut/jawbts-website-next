@@ -18,9 +18,14 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 # 感谢
-[mp4box.js](https://github.com/gpac/mp4box.js) 提供MP4文件解析.  
-[ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) 提供各类格式支持.  
-[node-qrcode](https://github.com/soldair/node-qrcode) 生成二维码.  
+[vercel](https://vercel.com/) 提供免费服务托管  
+[heroicons](https://github.com/tailwindlabs/heroicons) 提供图标  
+[tailwindcss](https://tailwindcss.com/) 提供css框架  
+[jose](https://www.npmjs.com/package/jose) 提供jwt加密解密库  
+[react](https://reactjs.org/) [nextjs](https://nextjs.org/) 提供的框架  
+[mp4box.js](https://github.com/gpac/mp4box.js) 提供MP4文件解析  
+[ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) 提供各类格式支持  
+[node-qrcode](https://github.com/soldair/node-qrcode) 生成二维码  
 
 ## Getting Started
 

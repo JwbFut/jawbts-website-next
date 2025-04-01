@@ -88,7 +88,7 @@ export default function Home() {
     const [loadMessage, setLoadMessage] = useState("");
     const [loadError, setLoadError] = useState(false);
 
-    const lmp = new LoadingMessageProvider(["正在加载中，请稍候...", "正在获取背景图片...", "你网络不是那么好, huh?"]);
+    const lmp = new LoadingMessageProvider(["正在加载中，请稍候...", "正在获取背景图片...", "正在等待网络...", "你网络不是那么好, huh?"]);
 
     useEffect(() => {
         if (loadStage == 0) {
@@ -104,6 +104,25 @@ export default function Home() {
             }
         }
     }, [loadStage]);
+
+    // redirecting loading animation
+    const [redirectMessage, setRedirectMessage] = useState("");
+    const lmp_redirect = new LoadingMessageProvider(["正在执行 Oauth2.0 认证协议...", "正在等待网络...", "github, 数据库, 你的网络 至少有一个挂了"]);
+
+    useEffect(() => {
+        if (loading) {
+            const interval = setInterval(() => {
+                if (!loading) {
+                    clearInterval(interval);
+                    return;
+                }
+                setRedirectMessage(lmp_redirect.getMessage());
+            }, 100);
+            return () => {
+                clearInterval(interval);
+            }
+        }
+    }, [loading]);
 
     return (
         <div className="bg-cover w-screen h-screen relative overflow-hidden">
@@ -144,6 +163,7 @@ export default function Home() {
                     </div>
                     <footer className={`transition my-5 text-[rgba(255,255,255,0)] hover:text-[rgba(255,255,255,1)] ${loadStage < 2 ? 'opacity-0 pointer-events-none' : 'opacity-100'}"`}>
                         {error && <div style={{ color: 'red' }}>{error}</div>}
+                        {redirectMessage.length > 0 && loading && <div>{redirectMessage}</div>}
                         <form onSubmit={onSubmit}>
                             <input className="my-5 bg-[rgba(0,0,0,0)] text-center" type="text" name="username" autoComplete="username" disabled={loading} hidden={cookieExist}></input> <br />
                             <button className="transition border-2 border-[rgba(0,0,0,0)] hover:border-white h-10 w-20 text-lg"

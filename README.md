@@ -26,6 +26,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 [mp4box.js](https://github.com/gpac/mp4box.js) 提供MP4文件解析  
 [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) 提供各类格式支持  
 [node-qrcode](https://github.com/soldair/node-qrcode) 生成二维码  
+[node](https://nodejs.org/zh-cn/) 提供运行环境  
 感谢其他基础设施建造维护者  
 
 ## Getting Started
